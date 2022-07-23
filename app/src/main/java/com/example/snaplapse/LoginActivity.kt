@@ -14,6 +14,7 @@ class LoginActivity : AppCompatActivity() {
         val username = findViewById<TextView>(R.id.username)
         val password = findViewById<TextView>(R.id.password)
         val loginButton = findViewById<Button>(R.id.login_button)
+        val registerButton = findViewById<Button>(R.id.register_button)
 
         loginButton.setOnClickListener{
             if (username.text.toString() == "user" && password.text.toString() == "pass") {
@@ -25,6 +26,10 @@ class LoginActivity : AppCompatActivity() {
                 password.text = ""
                 password.error = "Username/password is incorrect"
             }
+        }
+
+        registerButton.setOnClickListener{
+
         }
     }
 }
