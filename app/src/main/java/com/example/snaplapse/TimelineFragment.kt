@@ -53,8 +53,8 @@ class TimelineFragment : Fragment() {
 
         // This loop will create 20 Views containing
         // the image with the count of view
-        for (i in 1..20) {
-            data.add(ItemsViewModel(R.drawable.ic_map, "Item " + i))
+        for (i in 0..19) {
+            data.add(ItemsViewModel(R.drawable.statue_of_liberty, (2022 - i).toString()))
         }
 
         // This will pass the ArrayList to our Adapter
@@ -64,8 +64,6 @@ class TimelineFragment : Fragment() {
         recyclerview.adapter = adapter
 
         return view
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_timeline, container, false)
     }
 
     companion object {
