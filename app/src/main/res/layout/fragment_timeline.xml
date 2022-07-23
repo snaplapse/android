@@ -12,8 +12,10 @@
         android:text="@string/timeline_title" />
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/timeline_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:translationY="100dp" />
+        android:translationY="100dp"
+        tools:listitem="@layout/timeline_item"/>
 
 </FrameLayout>
