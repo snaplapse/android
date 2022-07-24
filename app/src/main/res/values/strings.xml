@@ -2,9 +2,10 @@
     <string name="app_name">SnapLapse</string>
 
     <!-- Login and Registration -->
+    <string name="empty_string"></string>
     <string name="login_title">Sign in to SnapLapse</string>
     <string name="login_button">Login</string>
-    <string name="forgot_password">Forgot Password?</string>
+    <string name="forgot_password_button">Forgot Password?</string>
     <string name="register_button">Register</string>
     <string name="register_title">Register an Account</string>
     <string name="username_hint">Username</string>
@@ -12,7 +13,21 @@
     <string name="register_username_hint">Username (4-16 characters)</string>
     <string name="re_enter_password_hint">Re-enter Password</string>
     <string name="sign_up_button">Sign Up</string>
+    <string name="reset_password_title">Reset Password</string>
+    <string name="new_password_hint">New Password</string>
+    <string name="reset_button">Reset</string>
+    <string name="incorrect_user_pass_error">Username/password is incorrect</string>
+    <string name="user_not_found_error">User could not be found</string>
+    <string name="empty_username_error">Username cannot be empty</string>
+    <string name="username_length_error">Username must be between 4 and 16 characters</string>
+    <string name="username_exists_error">Username already exists</string>
+    <string name="empty_password_error">Password cannot be empty</string>
+    <string name="mismatch_passwords_error">Passwords must match</string>
 
+    <string name="account_created_toast">Account successfully created</string>
+    <string name="password_changed_toast">Password successfully changed</string>
+
+    <string name="username_key">username</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
