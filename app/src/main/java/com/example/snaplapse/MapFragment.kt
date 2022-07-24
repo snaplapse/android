@@ -17,8 +17,8 @@ import com.google.android.gms.maps.model.MarkerOptions
 class MapFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
-    private lateinit var client: FusedLocationProviderClient
-    private lateinit var activity: MainActivity
+    //private lateinit var client: FusedLocationProviderClient
+    //private lateinit var activity: MainActivity
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
