@@ -29,9 +29,7 @@ class CustomAdapter(private val mList: List<ItemsViewModel>, private val fragmen
         // sets the image to the imageview from our itemHolder class
         holder.imageView.setImageResource(itemsViewModel.image)
         holder.imageView.setOnClickListener {
-            holder.textView.text = "swag"
-
-            val imageDetailsFragment = ImageDetailsFragment()
+            val imageDetailsFragment = ImageDetailsFragment(itemsViewModel)
             val fragmentTransaction = fragmentManager.beginTransaction()
             fragmentTransaction.replace(R.id.fragmentContainerView, imageDetailsFragment)
 //            fragmentTransaction.addToBackStack(null)
