@@ -47,7 +47,7 @@ class ProfileFragment : Fragment() {
 
         val data = ArrayList<ItemsViewModel>()
 
-        for (i in 0..3) {
+        for (i in 0..2) {
             data.add(ItemsViewModel(R.drawable.statue_of_liberty, ""))
         }
 
@@ -55,6 +55,9 @@ class ProfileFragment : Fragment() {
 
         // Setting the Adapter with the recyclerview
         recyclerview.adapter = adapter
+
+        var nPostsTextView = view.findViewById<TextView>(R.id.n_posts_id)
+        nPostsTextView.text = data.size.toString()
 
         return view
     }
