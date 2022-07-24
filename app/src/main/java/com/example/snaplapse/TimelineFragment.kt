@@ -1,10 +1,14 @@
 package com.example.snaplapse
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -27,14 +31,39 @@ class TimelineFragment : Fragment() {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_timeline, container, false)
+        val view: View = inflater.inflate(R.layout.fragment_timeline, container, false)
+//        val imageView: ImageView = view.findViewById<View>(R.id.imageview) as ImageView
+
+
+        // getting the recyclerview by its id
+        val recyclerview = view.findViewById<RecyclerView>(R.id.timeline_recycler_view)
+
+        // this creates a vertical layout Manager
+        recyclerview.layoutManager = LinearLayoutManager(MainActivity())
+
+        // ArrayList of class ItemsViewModel
+        val data = ArrayList<ItemsViewModel>()
+
+        // This loop will create 20 Views containing
+        // the image with the count of view
+        for (i in 0..19) {
+            data.add(ItemsViewModel(R.drawable.statue_of_liberty, (2022 - i).toString()))
+        }
+
+        // This will pass the ArrayList to our Adapter
+        val adapter = CustomAdapter(data)
+
+        // Setting the Adapter with the recyclerview
+        recyclerview.adapter = adapter
+
+        return view
     }
 
     companion object {
