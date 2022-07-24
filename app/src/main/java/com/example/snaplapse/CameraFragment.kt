@@ -113,8 +113,7 @@ class CameraFragment : Fragment() {
                 )
                 viewModel.setImageBitmap(imageBitmap)
                 val transaction = parentFragmentManager.beginTransaction()
-                transaction.replace(R.id.fragmentContainerView, PhotoEditFragment())
-                transaction.addToBackStack(null)
+                transaction.add(R.id.fragmentContainerView, PhotoEditFragment())
                 transaction.commit()
                 image.close()
             }
