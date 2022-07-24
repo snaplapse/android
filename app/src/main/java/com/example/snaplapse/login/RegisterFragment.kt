@@ -1,4 +1,4 @@
-package com.example.snaplapse
+package com.example.snaplapse.login
 
 import android.content.Context
 import android.os.Bundle
@@ -10,28 +10,12 @@ import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import com.example.snaplapse.R
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [RegisterFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class RegisterFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
     }
 
     override fun onCreateView(
@@ -44,7 +28,7 @@ class RegisterFragment : Fragment() {
         val username = view.findViewById<TextView>(R.id.register_username)
         val password = view.findViewById<TextView>(R.id.register_password)
         val confirmPassword = view.findViewById<TextView>(R.id.re_enter_password)
-        val backButton = view.findViewById<ImageButton>(R.id.back_button)
+        val backButton = view.findViewById<ImageButton>(R.id.register_back_button)
         val signupButton = view.findViewById<Button>(R.id.sign_up_button)
         val fragmentManager = parentFragmentManager
         val sharedPref = activity?.getPreferences(Context.MODE_PRIVATE)
@@ -57,26 +41,26 @@ class RegisterFragment : Fragment() {
             val usernameText = username?.text.toString().trim()
             var hasErrors = false
             if (usernameText == "") {
-                username?.error = "Field cannot be empty"
+                username?.error = resources.getString(R.string.empty_username_error)
                 hasErrors = true
             }
             else if (usernameText.length > 16 || usernameText.length < 4) {
-                username?.error = "Username must be between 4 and 16 characters"
+                username?.error = resources.getString(R.string.username_length_error)
                 hasErrors = true
             }
             else if (sharedPref?.contains(usernameText) == true) {
-                username?.error = "Username already exists"
+                username?.error = resources.getString(R.string.username_exists_error)
                 hasErrors = true
             }
 
             val passwordText = password?.text.toString()
             val confirmPasswordText = confirmPassword?.text.toString()
-            if (passwordText == "") {
-                password?.error = "Password must not be empty"
+            if (passwordText == resources.getString(R.string.empty_string)) {
+                password?.error = resources.getString(R.string.empty_password_error)
                 hasErrors = true
             }
             else if (passwordText != confirmPasswordText) {
-                confirmPassword?.error = "Passwords must match"
+                confirmPassword?.error = resources.getString(R.string.mismatch_passwords_error)
                 hasErrors = true
             }
 
@@ -86,31 +70,11 @@ class RegisterFragment : Fragment() {
                     this?.apply()
                 }
 
-                Toast.makeText(requireContext(), "Account successfully created", 4).show()
+                Toast.makeText(requireContext(), resources.getString(R.string.account_created_toast), Toast.LENGTH_SHORT).show()
                 fragmentManager.popBackStack()
             }
         }
 
         return view
-    }
-
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment RegisterFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            RegisterFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
     }
 }
