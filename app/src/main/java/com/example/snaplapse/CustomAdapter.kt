@@ -5,9 +5,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 
-class CustomAdapter(private val mList: List<ItemsViewModel>) : RecyclerView.Adapter<CustomAdapter.ViewHolder>() {
+
+class CustomAdapter(private val mList: List<ItemsViewModel>, private val fragmentManager: FragmentManager) : RecyclerView.Adapter<CustomAdapter.ViewHolder>() {
 
     // create new views
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -22,14 +24,20 @@ class CustomAdapter(private val mList: List<ItemsViewModel>) : RecyclerView.Adap
     // binds the list items to a view
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
-        val ItemsViewModel = mList[position]
+        val itemsViewModel = mList[position]
 
         // sets the image to the imageview from our itemHolder class
-        holder.imageView.setImageResource(ItemsViewModel.image)
+        holder.imageView.setImageResource(itemsViewModel.image)
+        holder.imageView.setOnClickListener {
+            val imageDetailsFragment = ImageDetailsFragment(itemsViewModel, mList)
+            val fragmentTransaction = fragmentManager.beginTransaction()
+            fragmentTransaction.replace(R.id.fragmentContainerView, imageDetailsFragment)
+//            fragmentTransaction.addToBackStack(null)
+            fragmentTransaction.commit()
+        }
 
         // sets the text to the textview from our itemHolder class
-        holder.textView.text = ItemsViewModel.text
-
+        holder.textView.text = itemsViewModel.text
     }
 
     // return the number of the items in the list

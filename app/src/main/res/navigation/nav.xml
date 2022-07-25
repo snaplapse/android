@@ -21,8 +21,13 @@
         android:label="fragment_profile"
         tools:layout="@layout/fragment_profile" />
     <fragment
-        android:id="@+id/timelineFragment"
+        android:id="@+id/timelineContainer"
         android:name="com.example.snaplapse.TimelineFragment"
         android:label="fragment_timeline"
         tools:layout="@layout/fragment_timeline" />
+    <fragment
+        android:id="@+id/forYouFragment"
+        android:name="com.example.snaplapse.ForYouFragment"
+        android:label="fragment_timeline"
+        tools:layout="@layout/fragment_for_you" />
 </navigation>
