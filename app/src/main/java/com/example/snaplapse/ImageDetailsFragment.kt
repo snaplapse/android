@@ -10,7 +10,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 
-class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<ItemsViewModel>) : Fragment() {
+class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<ItemsViewModel>, val item2: ItemsViewModel2? = null) : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -18,10 +18,15 @@ class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<Ite
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_image_details, container, false)
         val text = view.findViewById<TextView>(R.id.textView)
-        text.text = resources.getString(R.string.image_details).format(item.text)
         val img: ImageView = view.findViewById(R.id.imageView) as ImageView
-        img.setImageResource(item.image)
-        img.setOnTouchListener(OnSwipeTouchListener(activity, item, mList, view))
+        if (item2 == null) {
+            text.text = resources.getString(R.string.image_details).format(item.text)
+            img.setImageResource(item.image)
+            img.setOnTouchListener(OnSwipeTouchListener(activity, item, mList, view))
+        } else {
+            text.text = resources.getString(R.string.image_details).format(item2.text)
+            img.setImageBitmap(item2.image)
+        }
 
         val likeButton: ImageButton = view.findViewById(R.id.like_button) as ImageButton
         likeButton.setOnClickListener {

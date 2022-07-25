@@ -9,14 +9,18 @@ class CameraViewModel: ViewModel() {
     private val _imageBitmap = MutableLiveData<Bitmap>()
     val imageBitmap: LiveData<Bitmap> get() = _imageBitmap
 
-    private val _photoDescription = MutableLiveData<String>()
-    val photoDescription: LiveData<String> get() = _photoDescription
+    private val _profilePhotos = MutableLiveData<List<ItemsViewModel2>>()
+    val profilePhotos: LiveData<List<ItemsViewModel2>> get() = _profilePhotos
 
     fun setImageBitmap(imageBitmap: Bitmap) {
         _imageBitmap.value = imageBitmap
     }
 
-    fun setPhotoDescription(photoDescription: String) {
-        _photoDescription.value = photoDescription
+    fun appendProfilePhotos(profilePhoto: ItemsViewModel2) {
+        if (_profilePhotos.value == null) {
+            _profilePhotos.value = listOf(profilePhoto)
+        } else {
+            _profilePhotos.value = _profilePhotos.value as List<ItemsViewModel2> + profilePhoto
+        }
     }
 }
