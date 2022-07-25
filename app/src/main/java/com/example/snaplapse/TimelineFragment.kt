@@ -49,11 +49,8 @@ class TimelineFragment : Fragment() {
         // Setting the Adapter with the recyclerview
         recyclerview.adapter = adapter
 
-        backButton.setOnClickListener{
-            val forYouFragment = ForYouFragment()
-            val fragmentTransaction = parentFragmentManager.beginTransaction()
-            fragmentTransaction.replace(R.id.fragmentContainerView, forYouFragment)
-            fragmentTransaction.commit()
+        backButton.setOnClickListener {
+            parentFragmentManager.popBackStack()
         }
 
         return view

@@ -36,6 +36,7 @@ class ForYouAdapter(private val mList: List<ForYouViewModel>, private val fragme
                 val timelineFragment = TimelineFragment()
                 val fragmentTransaction = fragmentManager.beginTransaction()
                 fragmentTransaction.replace(R.id.fragmentContainerView, timelineFragment)
+                fragmentTransaction.addToBackStack(null)
                 fragmentTransaction.commit()
             }
             imageView.scaleType = ImageView.ScaleType.CENTER_CROP
