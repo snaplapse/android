@@ -17,11 +17,19 @@
         <entry key="app/src/main/res/layout/fragment_image_details.xml" value="0.1578125" />
         <entry key="app/src/main/res/layout/fragment_login.xml" value="0.15520833333333334" />
         <entry key="app/src/main/res/layout/fragment_photo_edit.xml" value="0.21693840579710144" />
+<<<<<<< HEAD
+        <entry key="app/src/main/res/layout/fragment_profile.xml" value="0.23697967529296876" />
+        <entry key="app/src/main/res/layout/fragment_register.xml" value="0.1578125" />
+        <entry key="app/src/main/res/layout/fragment_reset_password.xml" value="0.15520833333333334" />
+        <entry key="app/src/main/res/layout/fragment_timeline.xml" value="0.19610507246376813" />
+        <entry key="app/src/main/res/layout/profile_item.xml" value="0.17606811523437502" />
+=======
         <entry key="app/src/main/res/layout/fragment_profile.xml" value="0.20108695652173914" />
         <entry key="app/src/main/res/layout/fragment_register.xml" value="0.1578125" />
         <entry key="app/src/main/res/layout/fragment_reset_password.xml" value="0.15520833333333334" />
         <entry key="app/src/main/res/layout/fragment_timeline.xml" value="0.19610507246376813" />
         <entry key="app/src/main/res/layout/profile_item.xml" value="0.14114583333333333" />
+>>>>>>> main
         <entry key="app/src/main/res/layout/timeline_item.xml" value="0.21693840579710144" />
         <entry key="app/src/main/res/menu/bottom_menu.xml" value="0.3098958333333333" />
       </map>
