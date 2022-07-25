@@ -36,7 +36,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="profile_title">user</string>
-    <string name="profile_name">Among Bot</string>
+    <string name="profile_name">user</string>
     <string name="profile_posts">Posts</string>
     <string name="n_posts">0</string>
     <string name="profile_followers">Followers</string>
@@ -44,7 +44,7 @@
     <string name="profile_following">Following</string>
     <string name="n_following">0</string>
     <string name="timeline_title">Timeline</string>
-    <string name="image_details">Image Details\nDate: %s</string>
+    <string name="image_details">Date: %s</string>
     <string name="like_toast">Image liked!</string>
     <string name="flag_toast">Image flagged!</string>
     <string name="dummy_button">Dummy Button</string>

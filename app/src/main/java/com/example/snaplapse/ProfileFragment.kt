@@ -26,22 +26,11 @@ class ProfileFragment : Fragment() {
 
         val data = arrayOf(
             R.drawable.statue_of_liberty,
-            R.drawable.statue_of_liberty,
-            R.drawable.statue_of_liberty,
-            R.drawable.statue_of_liberty,
-            R.drawable.statue_of_liberty,
-            R.drawable.statue_of_liberty,
-            R.drawable.statue_of_liberty,
-            R.drawable.statue_of_liberty,
-            R.drawable.statue_of_liberty,
-            R.drawable.statue_of_liberty,
-            R.drawable.statue_of_liberty,
-            R.drawable.statue_of_liberty,
-            R.drawable.statue_of_liberty,
-            R.drawable.statue_of_liberty,
-            R.drawable.statue_of_liberty,
-            R.drawable.statue_of_liberty,
-            R.drawable.statue_of_liberty,
+            R.drawable.starbucks_waterloo,
+            R.drawable.tims_waterloo,
+            R.drawable.williams_waterloo,
+            R.drawable.cn_tower,
+            R.drawable.statue_of_liberty2,
         )
         val adapter = ProfileRecyclerViewAdapter(data)
         recyclerview.adapter = adapter
