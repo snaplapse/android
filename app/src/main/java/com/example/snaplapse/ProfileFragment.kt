@@ -30,13 +30,15 @@ class ProfileFragment : Fragment() {
             data = profilePhotos
             val adapter = ProfileRecyclerViewAdapter(data)
             recyclerview.adapter = adapter
+            val nPostsTextView = view.findViewById<TextView>(R.id.n_posts)
+            nPostsTextView.text = (data.size + 6).toString()
         }
 
         val adapter = ProfileRecyclerViewAdapter(data)
         recyclerview.adapter = adapter
 
         val nPostsTextView = view.findViewById<TextView>(R.id.n_posts)
-        nPostsTextView.text = data.size.toString()
+        nPostsTextView.text = (data.size + 6).toString()
 
         return view
     }
