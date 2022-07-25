@@ -16,11 +16,6 @@ import androidx.fragment.app.Fragment
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-/**
- * A simple [Fragment] subclass.
- * Use the [ImageFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<ItemsViewModel>) : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
@@ -40,21 +35,21 @@ class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<Ite
     ): View? {
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_image_details, container, false)
-        var text = view.findViewById<TextView>(R.id.textView)
+        val text = view.findViewById<TextView>(R.id.textView)
         text.text = resources.getString(R.string.image_details).format(item.text)
         val img: ImageView = view.findViewById(R.id.imageView) as ImageView
         img.setImageResource(item.image)
         img.setOnTouchListener(OnSwipeTouchListener(activity, item, mList, view))
 
-        var likeButton: ImageButton = view.findViewById(R.id.like_button) as ImageButton
-        likeButton.setOnClickListener(View.OnClickListener {
+        val likeButton: ImageButton = view.findViewById(R.id.like_button) as ImageButton
+        likeButton.setOnClickListener {
             Toast.makeText(activity, "Image liked!", Toast.LENGTH_SHORT).show()
-        })
+        }
 
-        var flagButton: ImageButton = view.findViewById(R.id.flag_button) as ImageButton
-        flagButton.setOnClickListener(View.OnClickListener {
+        val flagButton: ImageButton = view.findViewById(R.id.flag_button) as ImageButton
+        flagButton.setOnClickListener {
             Toast.makeText(activity, "Image flagged!", Toast.LENGTH_SHORT).show()
-        })
+        }
 
         val backButton = view.findViewById<ImageButton>(R.id.image_details_back_button)
         backButton.setOnClickListener{
