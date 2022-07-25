@@ -43,12 +43,12 @@ class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<Ite
 
         val likeButton: ImageButton = view.findViewById(R.id.like_button) as ImageButton
         likeButton.setOnClickListener {
-            Toast.makeText(activity, "Image liked!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity, resources.getString(R.string.like_toast), Toast.LENGTH_SHORT).show()
         }
 
         val flagButton: ImageButton = view.findViewById(R.id.flag_button) as ImageButton
         flagButton.setOnClickListener {
-            Toast.makeText(activity, "Image flagged!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(activity, resources.getString(R.string.flag_toast), Toast.LENGTH_SHORT).show()
         }
 
         val backButton = view.findViewById<ImageButton>(R.id.image_details_back_button)
