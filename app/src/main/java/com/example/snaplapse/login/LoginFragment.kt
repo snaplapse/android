@@ -37,6 +37,7 @@ class LoginFragment : Fragment() {
             val passwordText = password?.text.toString()
             if (sharedPref?.contains(usernameText) == true && sharedPref.getString(usernameText, resources.getString(R.string.empty_string)) == passwordText) {
                 val intent = Intent(activity, MainActivity::class.java)
+                intent.putExtra("username", usernameText)
                 startActivity(intent)
             }
             else {
