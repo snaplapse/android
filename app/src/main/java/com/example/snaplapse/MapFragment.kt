@@ -51,7 +51,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
     private fun setUpMap() {
         val currentLatLong = LatLng(43.469921938973776, -80.54219761274572)
         placeMarkerOnMap(currentLatLong)
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLong, 12f))
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLong, 17f))
 
     }
 
