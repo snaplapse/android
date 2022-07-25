@@ -15,6 +15,14 @@ import androidx.recyclerview.widget.RecyclerView
 
 class ProfileFragment : Fragment() {
     private val viewModel: CameraViewModel by activityViewModels()
+    private var usernameText: String? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            usernameText = it.getString(resources.getString(R.string.username_key))
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,6 +42,8 @@ class ProfileFragment : Fragment() {
             nPostsTextView.text = (data.size + 6).toString()
         }
 
+        val username = view.findViewById<TextView>(R.id.profile_username)
+        username.text = usernameText
         val adapter = ProfileRecyclerViewAdapter(data)
         recyclerview.adapter = adapter
 
