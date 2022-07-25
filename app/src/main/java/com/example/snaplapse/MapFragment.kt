@@ -1,8 +1,6 @@
 package com.example.snaplapse
 
-
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -37,6 +35,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         mMap.uiSettings.isZoomControlsEnabled = true
         mMap.setOnMarkerClickListener(this)
 
+
         setUpMap()
     }
 
@@ -44,7 +43,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         val currentLatLong = LatLng(43.469921938973776, -80.54219761274572)
         placeMarkerOnMap(currentLatLong)
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLong, 17f))
-
     }
 
     private fun placeMarkerOnMap(currentLatLong: LatLng) {
