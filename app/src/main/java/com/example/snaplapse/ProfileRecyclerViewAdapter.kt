@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
 
 class ProfileRecyclerViewAdapter(private val data: Array<Int>) : RecyclerView.Adapter<ProfileRecyclerViewAdapter.ViewHolder>() {
@@ -16,6 +17,15 @@ class ProfileRecyclerViewAdapter(private val data: Array<Int>) : RecyclerView.Ad
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val photo = data[position]
+        holder.itemView.setOnClickListener {
+            val transaction = (holder.itemView.context as FragmentActivity).supportFragmentManager.beginTransaction()
+            transaction.replace(
+                R.id.fragmentContainerView,
+                ImageDetailsFragment(ItemsViewModel(photo, ""), listOf())
+            )
+            transaction.addToBackStack(null)
+            transaction.commit()
+        }
         holder.imageView.setImageResource(photo)
     }
 
