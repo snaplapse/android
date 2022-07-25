@@ -1,6 +1,7 @@
 package com.example.snaplapse.login
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -10,6 +11,7 @@ import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import com.example.snaplapse.MainActivity
 import com.example.snaplapse.R
 
 class RegisterFragment : Fragment() {
@@ -71,7 +73,8 @@ class RegisterFragment : Fragment() {
                 }
 
                 Toast.makeText(requireContext(), resources.getString(R.string.account_created_toast), Toast.LENGTH_SHORT).show()
-                fragmentManager.popBackStack()
+                val intent = Intent(activity, MainActivity::class.java)
+                startActivity(intent)
             }
         }
 
