@@ -42,11 +42,27 @@ class ForYouFragment : Fragment() {
 
         recyclerView.layoutManager = LinearLayoutManager(MainActivity())
 
-        val data = ArrayList<ItemsViewModel>()
+        val data = ArrayList<ForYouViewModel>()
+        val recommendedSpots = ArrayList<Int>()
+        recommendedSpots.add(R.drawable.starbucks_waterloo)
+        recommendedSpots.add(R.drawable.tims_waterloo)
+        recommendedSpots.add(R.drawable.williams_waterloo)
+        val card = ForYouViewModel(recommendedSpots, "Coffee Shop")
+        data.add(card)
+
+        val recommendedSpots2 = ArrayList<Int>()
+        recommendedSpots2.add(R.drawable.statue_of_liberty)
+        recommendedSpots2.add(R.drawable.cn_tower)
+        val card2 = ForYouViewModel(recommendedSpots2, "Tourist Attraction")
+        data.add(card2)
+
+        val adapter = ForYouAdapter(data, parentFragmentManager)
 
         // in recycler view have tag as title for each category of recommended spots
         // from top 20 most recommended content group by category and sort largest group to smallest group
         // thumbnail of timeline should show image of most liked photo
+        recyclerView.adapter = adapter
+
         return view
     }
 

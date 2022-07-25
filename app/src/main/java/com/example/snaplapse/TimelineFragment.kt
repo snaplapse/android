@@ -4,10 +4,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
+import android.widget.ImageButton
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
@@ -44,6 +42,7 @@ class TimelineFragment : Fragment() {
 
         // getting the recyclerview by its id
         val recyclerview = view.findViewById<RecyclerView>(R.id.timeline_recycler_view)
+        val backButton = view.findViewById<ImageButton>(R.id.timeline_back_button)
 
         // this creates a vertical layout Manager
         recyclerview.layoutManager = LinearLayoutManager(MainActivity())
@@ -68,6 +67,14 @@ class TimelineFragment : Fragment() {
 
         // Setting the Adapter with the recyclerview
         recyclerview.adapter = adapter
+
+        backButton.setOnClickListener{
+            val forYouFragment = ForYouFragment()
+            val fragmentTransaction = parentFragmentManager.beginTransaction()
+            fragmentTransaction.replace(R.id.fragmentContainerView, forYouFragment)
+            fragmentTransaction.commit()
+        }
+
         return view
     }
 
