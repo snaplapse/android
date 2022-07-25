@@ -51,7 +51,7 @@ class ProfileFragment : Fragment() {
             data.add(ItemsViewModel(R.drawable.statue_of_liberty, ""))
         }
 
-        val adapter = CustomAdapter(data)
+        val adapter = CustomAdapter(data, parentFragmentManager)
 
         // Setting the Adapter with the recyclerview
         recyclerview.adapter = adapter
