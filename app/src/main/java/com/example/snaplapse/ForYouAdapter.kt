@@ -30,23 +30,24 @@ class ForYouAdapter(private val mList: List<ForYouViewModel>, private val fragme
 
         val forYouViewModel = mList[position]
         for (i in 0 until forYouViewModel.thumbnail.size) {
-            var imageView = ImageView(holder.linearLayout.context)
+            val imageView = ImageView(holder.linearLayout.context)
             imageView.setImageResource(forYouViewModel.thumbnail[i])
             imageView.setOnClickListener{
-
                 val timelineFragment = TimelineFragment()
                 val fragmentTransaction = fragmentManager.beginTransaction()
                 fragmentTransaction.replace(R.id.fragmentContainerView, timelineFragment)
                 fragmentTransaction.commit()
             }
+            imageView.scaleType = ImageView.ScaleType.CENTER_CROP
+            imageView.adjustViewBounds = true
             val params = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.WRAP_CONTENT
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.MATCH_PARENT
             ).apply {
                 weight = 1.0f
                 gravity = Gravity.LEFT
             }
-            params.width = 1000
+            params.height = 1000
             imageView.layoutParams = params
 
             holder.linearLayout.addView(imageView)
