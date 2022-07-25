@@ -13,6 +13,15 @@ import androidx.recyclerview.widget.RecyclerView
 
 
 class ProfileFragment : Fragment() {
+    private var usernameText: String? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            usernameText = it.getString(resources.getString(R.string.username_key))
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -21,6 +30,9 @@ class ProfileFragment : Fragment() {
         val view: View = inflater.inflate(R.layout.fragment_profile, container, false)
         val recyclerview = view.findViewById<RecyclerView>(R.id.profile_recycler_view)
         recyclerview.layoutManager = GridLayoutManager(MainActivity(), 3)
+
+        val username = view.findViewById<TextView>(R.id.profile_username)
+        username.text = usernameText
 
         val data = arrayOf(
             R.drawable.statue_of_liberty,

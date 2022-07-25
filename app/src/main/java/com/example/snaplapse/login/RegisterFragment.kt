@@ -74,6 +74,7 @@ class RegisterFragment : Fragment() {
 
                 Toast.makeText(requireContext(), resources.getString(R.string.account_created_toast), Toast.LENGTH_SHORT).show()
                 val intent = Intent(activity, MainActivity::class.java)
+                intent.putExtra("username", usernameText)
                 startActivity(intent)
             }
         }
