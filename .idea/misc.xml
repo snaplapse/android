@@ -3,13 +3,12 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Users/gauth/Documents/4A/ECE498A/android/app/src/main/res/drawable/ic_map.xml" value="0.1" />
-        <entry key="..\:/Users/gauth/Documents/4A/ECE498A/android/app/src/main/res/drawable/ic_profile.xml" value="0.1" />
-        <entry key="..\:/Users/gauth/Documents/4A/ECE498A/android/app/src/main/res/layout/fragment_profile.xml" value="0.2" />
-        <entry key="..\:/Users/gauth/Documents/4A/ECE498A/android/app/src/main/res/layout/fragment_timeline.xml" value="0.1" />
-        <entry key="..\:/Users/gauth/Documents/4A/ECE498A/android/app/src/main/res/layout/profile_item.xml" value="0.11302083333333333" />
-        <entry key="..\:/Users/gauth/Documents/4A/ECE498A/android/app/src/main/res/layout/timeline_item.xml" value="0.1" />
+        <entry key="..\:/Users/gauth/Documents/4A/ECE498A/android/app/src/main/res/layout/fragment_profile.xml" value="0.264" />
+        <entry key="..\:/Users/gauth/Documents/4A/ECE498A/android/app/src/main/res/layout/profile_item.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.19610507246376813" />
+        <entry key="app/src/main/res/layout/fragment_camera.xml" value="0.12808074951171877" />
+        <entry key="app/src/main/res/layout/fragment_profile.xml" value="0.20108695652173914" />
+        <entry key="app/src/main/res/layout/fragment_timeline.xml" value="0.19610507246376813" />
         <entry key="app/src/main/res/menu/bottom_menu.xml" value="0.3098958333333333" />
       </map>
     </option>
