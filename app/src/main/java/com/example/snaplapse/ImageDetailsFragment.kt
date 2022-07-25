@@ -4,8 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 
 
@@ -43,6 +45,10 @@ class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<Ite
         img.setImageResource(item.image)
         img.setOnTouchListener(OnSwipeTouchListener(activity, item, mList, view))
 
+        var likeButton: ImageButton = view.findViewById(R.id.likeButton) as ImageButton
+        likeButton.setOnClickListener(View.OnClickListener {
+            Toast.makeText(activity, "Image liked!", Toast.LENGTH_SHORT).show()
+        })
         // Inflate the layout for this fragment
         return view
     }

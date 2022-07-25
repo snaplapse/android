@@ -54,7 +54,7 @@ class TimelineFragment : Fragment() {
         // This loop will create 20 Views containing
         // the image with the count of view
         for (i in 0..19) {
-            var image: Int = if (i<10) {
+            var image: Int = if (i%2 == 0) {
                 R.drawable.statue_of_liberty
             } else {
                 R.drawable.statue_of_liberty2
