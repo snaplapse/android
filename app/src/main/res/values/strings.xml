@@ -45,6 +45,8 @@
     <string name="n_following">0</string>
     <string name="timeline_title">Timeline</string>
     <string name="image_details">Image Details\nDate: %s</string>
+    <string name="like_toast">Image liked!</string>
+    <string name="flag_toast">Image flagged!</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="back">Back</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
