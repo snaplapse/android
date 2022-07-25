@@ -32,7 +32,7 @@ class CustomAdapter(private val mList: List<ItemsViewModel>, private val fragmen
             val imageDetailsFragment = ImageDetailsFragment(itemsViewModel, mList)
             val fragmentTransaction = fragmentManager.beginTransaction()
             fragmentTransaction.replace(R.id.fragmentContainerView, imageDetailsFragment)
-//            fragmentTransaction.addToBackStack(null)
+            fragmentTransaction.addToBackStack(null)
             fragmentTransaction.commit()
         }
 
