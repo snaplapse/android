@@ -1,18 +1,11 @@
 package com.example.snaplapse
 
-import android.Manifest
-import android.annotation.SuppressLint
-import android.content.pm.PackageManager
-import android.location.Location
+
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.app.ActivityCompat
-import com.google.android.gms.common.api.Api
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -47,7 +40,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         setUpMap()
     }
 
-    @SuppressLint("MissingPermission")
     private fun setUpMap() {
         val currentLatLong = LatLng(43.469921938973776, -80.54219761274572)
         placeMarkerOnMap(currentLatLong)
