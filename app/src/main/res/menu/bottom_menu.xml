@@ -16,7 +16,7 @@
         android:icon="@drawable/ic_profile"
         android:title="Profile" />
     <item
-        android:id="@+id/timelineContainer"
-        android:icon="@android:drawable/ic_lock_idle_alarm"
-        android:title="Timeline" />
+        android:id="@+id/forYouFragment"
+        android:icon="@drawable/ic_baseline_star_24"
+        android:title="For You" />
 </menu>
