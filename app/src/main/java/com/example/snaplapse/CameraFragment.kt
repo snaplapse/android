@@ -1,59 +1,128 @@
 package com.example.snaplapse
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.Surface
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.core.*
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import com.example.snaplapse.databinding.FragmentCameraBinding
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [CameraFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class CameraFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private lateinit var safeContext: Context
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
+    private lateinit var _binding: FragmentCameraBinding
+    private val binding get() = _binding
+
+    private val viewModel: CameraViewModel by activityViewModels()
+
+    private var preview: Preview? = null
+    private var imageCapture: ImageCapture? = null
+    private var camera: Camera? = null
+    private lateinit var cameraExecutor: ExecutorService
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        safeContext = context
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_camera, container, false)
+    ): View {
+        _binding = FragmentCameraBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        if (allPermissionsGranted()) {
+            startCamera()
+        } else {
+            val requestMultiplePermissions = registerForActivityResult(
+                ActivityResultContracts.RequestMultiplePermissions()
+            ) { permissions ->
+                if (permissions.containsValue(false)) {
+                    Toast.makeText(safeContext, "Permissions not granted by the user.", Toast.LENGTH_SHORT).show()
+                } else {
+                    startCamera()
+                }
+            }
+            requestMultiplePermissions.launch(REQUIRED_PERMISSIONS)
+        }
+        binding.shutterButton.setOnClickListener { takePhoto() }
+        cameraExecutor = Executors.newSingleThreadExecutor()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        cameraExecutor.shutdown()
+    }
+
+    private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
+        ContextCompat.checkSelfPermission(safeContext, it) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun startCamera() {
+        val cameraProviderFuture = ProcessCameraProvider.getInstance(safeContext)
+
+        cameraProviderFuture.addListener({
+            val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
+            preview = Preview.Builder().build()
+            imageCapture = ImageCapture.Builder().build()
+            val cameraSelector = CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_BACK).build()
+            cameraProvider.unbindAll()
+            camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture)
+            preview?.setSurfaceProvider(binding.viewFinder.surfaceProvider)
+        }, ContextCompat.getMainExecutor(safeContext))
+    }
+
+    private fun takePhoto() {
+        val imageCapture = imageCapture ?: return
+        imageCapture.takePicture(ContextCompat.getMainExecutor(safeContext), object : ImageCapture.OnImageCapturedCallback() {
+            override fun onCaptureSuccess(image: ImageProxy) {
+                val buffer = image.planes[0].buffer
+                buffer.rewind()
+                val bytes = ByteArray(buffer.capacity())
+                buffer.get(bytes)
+                var imageBitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                imageBitmap = Bitmap.createBitmap(
+                    imageBitmap,
+                    0,
+                    0,
+                    imageBitmap.width,
+                    imageBitmap.height,
+                    Matrix().apply { postRotate(image.imageInfo.rotationDegrees.toFloat()) },
+                    true
+                )
+                viewModel.setImageBitmap(imageBitmap)
+                val transaction = parentFragmentManager.beginTransaction()
+                transaction.add(R.id.fragmentContainerView, PhotoEditFragment())
+                transaction.commit()
+                image.close()
+            }
+
+            override fun onError(exception: ImageCaptureException) {}
+        })
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment CameraFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            CameraFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
-                }
-            }
+        private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
     }
 }

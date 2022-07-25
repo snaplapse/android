@@ -8,12 +8,14 @@
     <ImageView
         android:id="@+id/imageview"
         android:layout_width="200dp"
-        android:layout_height="200dp" />
+        android:layout_height="200dp"
+        android:scaleType="fitEnd" />
 
     <TextView
         android:id="@+id/timelineItem"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
         android:text="TextView"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
