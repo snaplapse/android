@@ -1,13 +1,11 @@
 package com.example.snaplapse
 
-import android.location.Location
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
+import androidx.fragment.app.Fragment
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
@@ -36,6 +34,10 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
         mMap.uiSettings.isZoomControlsEnabled = true
+        mMap.animateCamera(
+            CameraUpdateFactory.newLatLngZoom(
+                LatLng(43.4722066,-80.5385672), 17.0f
+            ))
 
         setUpMap()
     }
@@ -44,7 +46,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         //heres where location code would go
         mMap.addMarker(
             MarkerOptions()
-                .position(LatLng(0.0, 0.0))
+                .position(LatLng(43.4722066, -80.5385672))
                 .title("Marker")
         )
     }
