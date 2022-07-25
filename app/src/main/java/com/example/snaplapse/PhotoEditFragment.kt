@@ -1,5 +1,6 @@
 package com.example.snaplapse
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Bundle
@@ -12,6 +13,8 @@ import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.snaplapse.databinding.FragmentPhotoEditBinding
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class PhotoEditFragment : Fragment() {
     private lateinit var safeContext: Context
@@ -53,6 +56,7 @@ class PhotoEditFragment : Fragment() {
         binding.uploadButton.setOnClickListener { uploadPhoto() }
     }
 
+    @SuppressLint("NewApi")
     private fun uploadPhoto() {
         val description = binding.textInput.text.toString()
         if (description.isBlank()) {
@@ -63,7 +67,9 @@ class PhotoEditFragment : Fragment() {
                 "Uploaded photo: " + binding.textInput.text.toString(),
                 Toast.LENGTH_SHORT
             ).show()
-            viewModel.appendProfilePhotos(ItemsViewModel2(imageBitmap, binding.textInput.text.toString()))
+            val current = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+            val text = current.toString() + "\n" + binding.textInput.text.toString()
+            viewModel.appendProfilePhotos(ItemsViewModel2(imageBitmap, text))
             val imm = requireActivity().getSystemService(
                 Context.INPUT_METHOD_SERVICE
             ) as InputMethodManager
