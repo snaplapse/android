@@ -1,6 +1,7 @@
 package com.example.snaplapse
 
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,6 +36,16 @@ class ForYouAdapter(private val mList: List<ForYouViewModel>, private val fragme
                 fragmentTransaction.replace(R.id.fragmentContainerView, timelineFragment)
                 fragmentTransaction.commit()
             }
+            val params = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            ).apply {
+                weight = 1.0f
+                gravity = Gravity.LEFT
+            }
+            params.width = 1000
+            imageView.layoutParams = params
+
             holder.linearLayout.addView(imageView)
         }
 
