@@ -38,6 +38,7 @@ class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<Ite
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_image_details, container, false)
         var text = view.findViewById<TextView>(R.id.textView)
         text.text = resources.getString(R.string.image_details).format(item.text)
@@ -45,11 +46,23 @@ class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<Ite
         img.setImageResource(item.image)
         img.setOnTouchListener(OnSwipeTouchListener(activity, item, mList, view))
 
-        var likeButton: ImageButton = view.findViewById(R.id.likeButton) as ImageButton
+        var likeButton: ImageButton = view.findViewById(R.id.like_button) as ImageButton
         likeButton.setOnClickListener(View.OnClickListener {
             Toast.makeText(activity, "Image liked!", Toast.LENGTH_SHORT).show()
         })
-        // Inflate the layout for this fragment
+
+        var flagButton: ImageButton = view.findViewById(R.id.flag_button) as ImageButton
+        flagButton.setOnClickListener(View.OnClickListener {
+            Toast.makeText(activity, "Image flagged!", Toast.LENGTH_SHORT).show()
+        })
+
+        val backButton = view.findViewById<ImageButton>(R.id.image_details_back_button)
+        backButton.setOnClickListener{
+            val timelineFragment = TimelineFragment()
+            val fragmentTransaction = parentFragmentManager.beginTransaction()
+            fragmentTransaction.replace(R.id.fragmentContainerView, timelineFragment)
+            fragmentTransaction.commit()
+        }
         return view
     }
 
