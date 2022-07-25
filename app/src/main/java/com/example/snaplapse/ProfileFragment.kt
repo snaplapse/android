@@ -22,6 +22,8 @@ class ProfileFragment : Fragment() {
         val recyclerview = view.findViewById<RecyclerView>(R.id.profile_recycler_view)
         recyclerview.layoutManager = GridLayoutManager(MainActivity(), 3)
 
+        
+
         val data = arrayOf(
             R.drawable.statue_of_liberty,
             R.drawable.statue_of_liberty,
