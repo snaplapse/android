@@ -1,6 +1,7 @@
 package com.example.snaplapse
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,6 +20,8 @@ class PhotoEditFragment : Fragment() {
     private val binding get() = _binding
 
     private val viewModel: CameraViewModel by activityViewModels()
+
+    private lateinit var imageBitmap: Bitmap
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -44,6 +47,7 @@ class PhotoEditFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.imageBitmap.observe(viewLifecycleOwner) { imageBitmap ->
+            this.imageBitmap = imageBitmap
             binding.imageView.setImageBitmap(imageBitmap)
         }
         binding.uploadButton.setOnClickListener { uploadPhoto() }
@@ -59,7 +63,7 @@ class PhotoEditFragment : Fragment() {
                 "Uploaded photo: " + binding.textInput.text.toString(),
                 Toast.LENGTH_SHORT
             ).show()
-            viewModel.setPhotoDescription(binding.textInput.text.toString())
+            viewModel.appendProfilePhotos(ItemsViewModel2(imageBitmap, binding.textInput.text.toString()))
             val imm = requireActivity().getSystemService(
                 Context.INPUT_METHOD_SERVICE
             ) as InputMethodManager

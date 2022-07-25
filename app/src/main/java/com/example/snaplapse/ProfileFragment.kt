@@ -1,18 +1,21 @@
 package com.example.snaplapse
 
+import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 
 class ProfileFragment : Fragment() {
+    private val viewModel: CameraViewModel by activityViewModels()
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -22,14 +25,13 @@ class ProfileFragment : Fragment() {
         val recyclerview = view.findViewById<RecyclerView>(R.id.profile_recycler_view)
         recyclerview.layoutManager = GridLayoutManager(MainActivity(), 3)
 
-        val data = arrayOf(
-            R.drawable.statue_of_liberty,
-            R.drawable.starbucks_waterloo,
-            R.drawable.tims_waterloo,
-            R.drawable.williams_waterloo,
-            R.drawable.cn_tower,
-            R.drawable.statue_of_liberty2,
-        )
+        var data = listOf<ItemsViewModel2>()
+        viewModel.profilePhotos.observe(viewLifecycleOwner) { profilePhotos ->
+            data = profilePhotos
+            val adapter = ProfileRecyclerViewAdapter(data)
+            recyclerview.adapter = adapter
+        }
+
         val adapter = ProfileRecyclerViewAdapter(data)
         recyclerview.adapter = adapter
 
