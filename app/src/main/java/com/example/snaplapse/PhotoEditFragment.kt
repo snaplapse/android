@@ -54,6 +54,7 @@ class PhotoEditFragment : Fragment() {
             binding.imageView.setImageBitmap(imageBitmap)
         }
         binding.uploadButton.setOnClickListener { uploadPhoto() }
+        binding.deleteButton.setOnClickListener { deletePhoto() }
     }
 
     @SuppressLint("NewApi")
@@ -78,5 +79,11 @@ class PhotoEditFragment : Fragment() {
             transaction.add(R.id.fragmentContainerView, CameraFragment())
             transaction.commit()
         }
+    }
+
+    private fun deletePhoto() {
+        val transaction = parentFragmentManager.beginTransaction()
+        transaction.add(R.id.fragmentContainerView, CameraFragment())
+        transaction.commit()
     }
 }
