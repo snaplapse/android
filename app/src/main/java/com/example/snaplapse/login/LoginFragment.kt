@@ -30,15 +30,19 @@ class LoginFragment : Fragment() {
         val registerButton = view.findViewById<Button>(R.id.register_button)
         val forgotPasswordButton = view.findViewById<TextView>(R.id.forgot_password_button)
         val fragmentManager = parentFragmentManager
-        val sharedPref = activity?.getPreferences(Context.MODE_PRIVATE)
+        val sharedPref = activity?.getSharedPreferences(getString(R.string.preferences_file_key), Context.MODE_PRIVATE)
 
         loginButton?.setOnClickListener{
             val usernameText = username?.text.toString()
             val passwordText = password?.text.toString()
-            if (sharedPref?.contains(usernameText) == true && sharedPref.getString(usernameText, resources.getString(R.string.empty_string)) == passwordText) {
-                val intent = Intent(activity, MainActivity::class.java)
-                intent.putExtra("username", usernameText)
-                startActivity(intent)
+            if (sharedPref?.contains(usernameText) == true && sharedPref.getString(usernameText, "") == passwordText)
+            {
+                with(sharedPref?.edit()) {
+                    this?.putString("session", usernameText)
+                    this?.apply()
+                }
+
+                startMainActivity(usernameText)
             }
             else {
                 username?.text = resources.getString(R.string.empty_string)
@@ -62,7 +66,7 @@ class LoginFragment : Fragment() {
         forgotPasswordButton?.setOnClickListener{
             val usernameText = username?.text.toString()
             if (sharedPref?.contains(usernameText) == false) {
-                Toast.makeText(requireContext(), resources.getString(R.string.user_not_found_error), 4).show()
+                Toast.makeText(requireContext(), resources.getString(R.string.user_not_found_error), Toast.LENGTH_SHORT).show()
             }
             else {
                 username?.text = resources.getString(R.string.empty_string)
@@ -81,7 +85,17 @@ class LoginFragment : Fragment() {
             }
         }
 
+        if (sharedPref?.contains("session") == true) {
+            startMainActivity(sharedPref?.getString("session", ""))
+        }
+
         return view
+    }
+
+    private fun startMainActivity(username: String?) {
+        val intent = Intent(activity, MainActivity::class.java)
+        intent.putExtra("username", username)
+        startActivity(intent)
     }
 
     companion object {

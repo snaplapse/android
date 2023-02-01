@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">SnapLapse</string>
+    <string name="preferences_file_key">preferences</string>
 
     <!-- Login and Registration -->
     <string name="empty_string"></string>
@@ -42,6 +43,48 @@
     <string name="flag_dialog_title">Report Image</string>
     <string name="flag_dialog_confirm">Report</string>
     <string name="flag_dialog_cancel">Cancel</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Settings</string>
+    <string name="default_user">(null)</string>
+    <string name="date_joined_tag">Date Joined: January 01 1970</string>
+    <string name="photo_timeline_tag">Uploaded %s photos into %s unique timelines</string>
+    <string name="change_avatar_button">Change Avatar</string>
+    <string name="edit_username_button">Edit Username</string>
+    <string name="change_password_button">Change Password</string>
+    <string name="about_button">About</string>
+    <string name="log_out_button">Log Out</string>
+    <string name="delete_account_button">Delete Account</string>
+
+    <!-- Edit Username -->
+    <string name="edit_username_title">Edit Username</string>
+    <string name="edit_username_text_1">Enter a new username</string>
+    <string name="edit_username_confirm">Confirm</string>
+
+    <!-- Change Password -->
+    <string name="change_password_title">Change Password</string>
+    <string name="change_password_text_1">Enter a new password</string>
+    <string name="change_password_confirm">Confirm</string>
+
+    <!-- About -->
+    <string name="about_title">About</string>
+    <string name="about_text_1">Snaplapse ia a project created to fulfill the capstone project requirements</string>
+    <string name="about_text_2">ECE Class of 2023</string>
+    <string name="about_text_3">Developers: Agam Sidhu, Daniel Kim, Gautham Erathasari, Kevin Chik, Raymond Xia</string>
+    <string name="about_text_4">Advisor: Professor John Thistle from the University of Waterloo</string>
+    <string name="about_text_5">Course Instructor: Professor Sagar Naik from the University of Waterloo</string>
+
+    <!-- Log Out -->
+    <string name="log_out_dialog_title">Log Out of Snaplapse?</string>
+    <string name="log_out_dialog_confirm">Confirm</string>
+    <string name="log_out_dialog_cancel">Cancel</string>
+
+    <!-- Delete Account -->
+    <string name="delete_account_title">Delete Account</string>
+    <string name="delete_account_text_1">Deleting your account will remove your profile and all photos that you have uploaded and shared</string>
+    <string name="delete_account_text_2">You will not be able to log in to an account that has been deleted</string>
+    <string name="delete_account_text_3">This action is irreversible</string>
+    <string name="delete_account_text_4">To delete your account, type your username below (case sensitive)</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>

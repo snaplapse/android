@@ -1,4 +1,4 @@
-package com.example.snaplapse.login
+package com.example.snaplapse.settings
 
 import android.content.Context
 import android.os.Bundle
@@ -9,59 +9,56 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
-import android.widget.Toast
 import com.example.snaplapse.R
 
-class ResetPasswordFragment : Fragment() {
-    private var username: String? = null
+class ChangePasswordFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            username = it.getString(resources.getString(R.string.username_key))
         }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View {
-        val view:View = inflater.inflate(R.layout.fragment_reset_password, container, false)
-        val usernameView = view.findViewById<TextView>(R.id.reset_user)
-        val password = view.findViewById<TextView>(R.id.new_password)
-        val confirmPassword = view.findViewById<TextView>(R.id.reset_re_enter_password)
-        val backButton = view.findViewById<ImageButton>(R.id.reset_back_button)
-        val resetButton = view.findViewById<Button>(R.id.reset_button)
-        val fragmentManager = parentFragmentManager
+    ): View? {
+        // Inflate the layout for this fragment
+        val view = inflater.inflate(R.layout.fragment_change_password, container, false)
+        val password = view.findViewById<TextView>(R.id.change_password_input)
+        val confirmPassword = view.findViewById<TextView>(R.id.change_password_input_confirm)
+        val backButton = view.findViewById<ImageButton>(R.id.change_password_back_button)
+        val confirmButton = view.findViewById<Button>(R.id.change_password_confirm)
         val sharedPref = activity?.getSharedPreferences(getString(R.string.preferences_file_key), Context.MODE_PRIVATE)
 
-        usernameView.text = username
+        val username = sharedPref?.getString("session", "")
 
-        backButton?.setOnClickListener{
-            fragmentManager.popBackStack()
+        backButton.setOnClickListener {
+            parentFragmentManager.popBackStack()
         }
 
-        resetButton?.setOnClickListener{
-            val usernameText = usernameView.text.toString()
+        confirmButton.setOnClickListener {
+            var hasErrors = false
+
             val passwordText = password?.text.toString()
             val confirmPasswordText = confirmPassword?.text.toString()
             if (passwordText == resources.getString(R.string.empty_string)) {
                 password?.error = resources.getString(R.string.empty_password_error)
+                hasErrors = true
             }
             else if (passwordText != confirmPasswordText) {
                 confirmPassword?.error = resources.getString(R.string.mismatch_passwords_error)
+                hasErrors = true
             }
-            else {
+
+            if (!hasErrors) {
                 with(sharedPref?.edit()) {
-                    this?.putString(usernameText, passwordText)
+                    this?.putString(username, passwordText)
                     this?.apply()
                 }
-
-                Toast.makeText(requireContext(), resources.getString(R.string.password_changed_toast), Toast.LENGTH_SHORT).show()
-                fragmentManager.popBackStack()
+                parentFragmentManager.popBackStack()
             }
         }
-
         return view
     }
 }
