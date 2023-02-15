@@ -39,7 +39,7 @@ class ForYouAdapter(private val mList: List<ForYouViewModel>, private val fragme
                 fragmentTransaction.addToBackStack(null)
                 fragmentTransaction.commit()
             }
-            imageView.scaleType = ImageView.ScaleType.CENTER_CROP
+            imageView.scaleType = ImageView.ScaleType.CENTER_INSIDE
             imageView.adjustViewBounds = true
             val params = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,
