@@ -3,7 +3,6 @@ package com.example.snaplapse.login
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,8 +10,11 @@ import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import com.example.snaplapse.MainActivity
 import com.example.snaplapse.R
+import java.text.SimpleDateFormat
+import java.util.*
 
 class RegisterFragment : Fragment() {
 
@@ -33,7 +35,7 @@ class RegisterFragment : Fragment() {
         val backButton = view.findViewById<ImageButton>(R.id.register_back_button)
         val signupButton = view.findViewById<Button>(R.id.sign_up_button)
         val fragmentManager = parentFragmentManager
-        val sharedPref = activity?.getPreferences(Context.MODE_PRIVATE)
+        val sharedPref = activity?.getSharedPreferences(getString(R.string.preferences_file_key), Context.MODE_PRIVATE)
 
         backButton?.setOnClickListener{
             fragmentManager.popBackStack()
@@ -67,8 +69,13 @@ class RegisterFragment : Fragment() {
             }
 
             if (!hasErrors) {
+                val c = Calendar.getInstance().time
+                val df = SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault())
+                val formattedDate = df.format(c)
+
                 with(sharedPref?.edit()) {
                     this?.putString(usernameText, passwordText)
+                    this?.putString("session", usernameText)
                     this?.apply()
                 }
 
