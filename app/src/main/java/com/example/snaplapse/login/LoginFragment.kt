@@ -2,6 +2,7 @@ package com.example.snaplapse.login
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -16,11 +17,8 @@ import com.example.snaplapse.MainActivity
 import com.example.snaplapse.R
 import com.example.snaplapse.api.RetrofitHelper
 import com.example.snaplapse.api.UsersApi
-import com.example.snaplapse.api.data.LoginRequest
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import okhttp3.MediaType
-import okhttp3.RequestBody
+import com.example.snaplapse.api.data.UserCredentialsRequest
+import org.json.JSONArray
 import org.json.JSONObject
 
 class LoginFragment : Fragment() {
@@ -33,7 +31,7 @@ class LoginFragment : Fragment() {
 
     var usernameView: TextView? = null
     var passwordView: TextView? = null
-
+    var sharedPref: SharedPreferences? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,7 +44,7 @@ class LoginFragment : Fragment() {
         val registerButton = view.findViewById<Button>(R.id.register_button)
         val forgotPasswordButton = view.findViewById<TextView>(R.id.forgot_password_button)
         val fragmentManager = parentFragmentManager
-        val sharedPref = activity?.getSharedPreferences(getString(R.string.preferences_file_key), Context.MODE_PRIVATE)
+        sharedPref = activity?.getSharedPreferences(getString(R.string.preferences_file_key), Context.MODE_PRIVATE)
 
         loginButton?.setOnClickListener{
             val usernameText = usernameView?.text.toString()
@@ -56,9 +54,7 @@ class LoginFragment : Fragment() {
         }
 
         registerButton?.setOnClickListener{
-            usernameView?.text = resources.getString(R.string.empty_string)
-            passwordView?.text = resources.getString(R.string.empty_string)
-            passwordView?.error = null
+            resetFields()
 
             val registerFragment = RegisterFragment()
             val transaction = fragmentManager.beginTransaction()
@@ -73,9 +69,7 @@ class LoginFragment : Fragment() {
                 Toast.makeText(requireContext(), resources.getString(R.string.user_not_found_error), Toast.LENGTH_SHORT).show()
             }
             else {
-                usernameView?.text = resources.getString(R.string.empty_string)
-                passwordView?.text = resources.getString(R.string.empty_string)
-                passwordView?.error = null
+                resetFields()
 
                 var args = Bundle()
                 args.putString(resources.getString(R.string.username_key), usernameText)
@@ -89,29 +83,32 @@ class LoginFragment : Fragment() {
             }
         }
 
-        if (sharedPref?.contains("session") == true) {
-            startMainActivity(sharedPref?.getString("session", ""))
-        }
-
         return view
     }
 
     private fun userLogin(username: String, password: String) {
         lifecycleScope.launchWhenCreated {
            try {
-               val requestBody = LoginRequest(username=username, secret=password)
+               val requestBody = UserCredentialsRequest(username=username, secret=password)
                val response = userListApi.login(requestBody)
                if (response.isSuccessful) {
-                   val intent = Intent(activity, MainActivity::class.java)
-                   intent.putExtra("username", username)
-                   startActivity(intent)
+                   // this line is so bad loool
+                   val extractedUsername = JSONObject(JSONObject(JSONArray(response.body()?.data.toString())[0].toString()).get("fields").toString()).get("username").toString()
+
+                    with(sharedPref?.edit()) {
+                        this?.putString("session", extractedUsername)
+                        this?.apply()
+                    }
+
+                   startMainActivity()
                }
                else {
-                    resetFields()
-                    setErrorMessage(resources.getString(R.string.incorrect_user_pass_error))
+                   resetFields()
+                   val message = response.body()?.message
+                   setErrorMessage(message)
                }
            } catch (e: Exception) {
-
+                Log.e("LoginError", e.toString())
            }
         }
     }
@@ -122,8 +119,12 @@ class LoginFragment : Fragment() {
         passwordView?.error = null
     }
 
-    private fun setErrorMessage(message: String) {
+    private fun setErrorMessage(message: String?) {
         passwordView?.error = message
     }
 
+    private fun startMainActivity() {
+        val intent = Intent(activity, MainActivity::class.java)
+        startActivity(intent)
+    }
 }

@@ -2,7 +2,9 @@ package com.example.snaplapse.login
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,16 +13,24 @@ import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.example.snaplapse.MainActivity
 import com.example.snaplapse.R
-import java.text.SimpleDateFormat
-import java.util.*
+import com.example.snaplapse.api.RetrofitHelper
+import com.example.snaplapse.api.UsersApi
+import com.example.snaplapse.api.data.UserCredentialsRequest
 
 class RegisterFragment : Fragment() {
+
+    private val userListApi = RetrofitHelper.getInstance().create(UsersApi::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
+
+    var usernameView: TextView? = null
+    var passwordView: TextView? = null
+    var sharedPref: SharedPreferences? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -29,38 +39,34 @@ class RegisterFragment : Fragment() {
         // Inflate the layout for this fragment
         val view:View = inflater.inflate(R.layout.fragment_register, container, false)
 
-        val username = view.findViewById<TextView>(R.id.register_username)
-        val password = view.findViewById<TextView>(R.id.register_password)
+        usernameView = view.findViewById(R.id.register_username)
+        passwordView = view.findViewById(R.id.register_password)
         val confirmPassword = view.findViewById<TextView>(R.id.re_enter_password)
         val backButton = view.findViewById<ImageButton>(R.id.register_back_button)
         val signupButton = view.findViewById<Button>(R.id.sign_up_button)
         val fragmentManager = parentFragmentManager
-        val sharedPref = activity?.getSharedPreferences(getString(R.string.preferences_file_key), Context.MODE_PRIVATE)
+        sharedPref = activity?.getSharedPreferences(getString(R.string.preferences_file_key), Context.MODE_PRIVATE)
 
         backButton?.setOnClickListener{
             fragmentManager.popBackStack()
         }
 
         signupButton?.setOnClickListener{
-            val usernameText = username?.text.toString().trim()
+            val usernameText = usernameView?.text.toString().trim()
             var hasErrors = false
             if (usernameText == "") {
-                username?.error = resources.getString(R.string.empty_username_error)
+                usernameView?.error = resources.getString(R.string.empty_username_error)
                 hasErrors = true
             }
             else if (usernameText.length > 16 || usernameText.length < 4) {
-                username?.error = resources.getString(R.string.username_length_error)
-                hasErrors = true
-            }
-            else if (sharedPref?.contains(usernameText) == true) {
-                username?.error = resources.getString(R.string.username_exists_error)
+                usernameView?.error = resources.getString(R.string.username_length_error)
                 hasErrors = true
             }
 
-            val passwordText = password?.text.toString()
+            val passwordText = passwordView?.text.toString()
             val confirmPasswordText = confirmPassword?.text.toString()
             if (passwordText == resources.getString(R.string.empty_string)) {
-                password?.error = resources.getString(R.string.empty_password_error)
+                passwordView?.error = resources.getString(R.string.empty_password_error)
                 hasErrors = true
             }
             else if (passwordText != confirmPasswordText) {
@@ -69,23 +75,33 @@ class RegisterFragment : Fragment() {
             }
 
             if (!hasErrors) {
-                val c = Calendar.getInstance().time
-                val df = SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault())
-                val formattedDate = df.format(c)
-
-                with(sharedPref?.edit()) {
-                    this?.putString(usernameText, passwordText)
-                    this?.putString("session", usernameText)
-                    this?.apply()
-                }
-
-                Toast.makeText(requireContext(), resources.getString(R.string.account_created_toast), Toast.LENGTH_SHORT).show()
-                val intent = Intent(activity, MainActivity::class.java)
-                intent.putExtra("username", usernameText)
-                startActivity(intent)
+                userRegister(usernameText, passwordText)
             }
         }
 
         return view
+    }
+
+    private fun userRegister(username: String, password: String) {
+        lifecycleScope.launchWhenCreated {
+            try {
+                val requestBody = UserCredentialsRequest(username=username, secret=password)
+                val response = userListApi.register(requestBody)
+                if (response.isSuccessful) {
+                    with(sharedPref?.edit()) {
+                        this?.putString("session", response.body()?.username)
+                        this?.apply()
+                    }
+
+                    val intent = Intent(activity, MainActivity::class.java)
+                    startActivity(intent)
+                }
+                else {
+                    usernameView?.error = "Username already exists"
+                }
+            } catch (e: Exception) {
+                Log.e("RegisterError", e.toString())
+            }
+        }
     }
 }

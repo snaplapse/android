@@ -5,3 +5,4 @@ data class LoginResult(
     val message: String,
     val data: String
 )
+
