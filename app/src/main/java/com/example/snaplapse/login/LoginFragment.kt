@@ -46,7 +46,7 @@ class LoginFragment : Fragment() {
         val registerButton = view.findViewById<Button>(R.id.register_button)
         val forgotPasswordButton = view.findViewById<TextView>(R.id.forgot_password_button)
         val fragmentManager = parentFragmentManager
-        val sharedPref = activity?.getPreferences(Context.MODE_PRIVATE)
+        val sharedPref = activity?.getSharedPreferences(getString(R.string.preferences_file_key), Context.MODE_PRIVATE)
 
         loginButton?.setOnClickListener{
             val usernameText = usernameView?.text.toString()
@@ -87,6 +87,10 @@ class LoginFragment : Fragment() {
                 transaction.addToBackStack(null)
                 transaction.commit()
             }
+        }
+
+        if (sharedPref?.contains("session") == true) {
+            startMainActivity(sharedPref?.getString("session", ""))
         }
 
         return view

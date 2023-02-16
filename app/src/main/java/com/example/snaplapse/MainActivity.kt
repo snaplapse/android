@@ -17,6 +17,7 @@ class MainActivity : AppCompatActivity() {
         val navHostFragment = supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
         val bundle = Bundle()
         bundle.putString("username", intent.extras?.getString("username"))
+        bundle.putString("joined", intent.extras?.getString("joined"))
         val navController = navHostFragment.navController
         bottomNavigationView.setupWithNavController(navController)
         bottomNavigationView.setOnItemSelectedListener {

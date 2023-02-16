@@ -1,16 +1,15 @@
 package com.example.snaplapse
 
-import android.graphics.Bitmap
+import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
+import android.widget.ImageButton
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.snaplapse.settings.SettingsFragment
 
 
 class ProfileFragment : Fragment() {
@@ -20,7 +19,7 @@ class ProfileFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            usernameText = it.getString(resources.getString(R.string.username_key))
+            usernameText = activity?.getSharedPreferences(getString(R.string.preferences_file_key), Context.MODE_PRIVATE)?.getString("session", "")
         }
     }
 
@@ -49,6 +48,14 @@ class ProfileFragment : Fragment() {
 
         val nPostsTextView = view.findViewById<TextView>(R.id.n_posts)
         nPostsTextView.text = (data.size + 6).toString()
+
+        val settingsButton: ImageButton = view.findViewById(R.id.settings_button)
+        settingsButton.setOnClickListener {
+            val transaction = parentFragmentManager.beginTransaction()
+            transaction.replace(R.id.fragmentContainerView, SettingsFragment())
+            transaction.addToBackStack(null)
+            transaction.commit()
+        }
 
         return view
     }
