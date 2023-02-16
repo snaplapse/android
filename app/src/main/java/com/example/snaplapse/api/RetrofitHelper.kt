@@ -7,7 +7,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitHelper {
 
-    private const val baseUrl = "https://snaplapse.herokuapp.com/"
+//    private const val baseUrl = "https://snaplapse.herokuapp.com/"
+    private const val baseUrl="http://10.0.2.2:8000/"
 
     fun getInstance(): Retrofit {
 
