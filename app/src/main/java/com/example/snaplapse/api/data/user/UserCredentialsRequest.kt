@@ -1,4 +1,4 @@
-package com.example.snaplapse.api.data
+package com.example.snaplapse.api.data.user
 
 data class UserCredentialsRequest(
     val username: String,

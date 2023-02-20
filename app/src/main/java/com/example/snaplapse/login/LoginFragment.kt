@@ -17,7 +17,7 @@ import com.example.snaplapse.MainActivity
 import com.example.snaplapse.R
 import com.example.snaplapse.api.RetrofitHelper
 import com.example.snaplapse.api.UsersApi
-import com.example.snaplapse.api.data.UserCredentialsRequest
+import com.example.snaplapse.api.data.user.UserCredentialsRequest
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -94,9 +94,11 @@ class LoginFragment : Fragment() {
                if (response.isSuccessful) {
                    // this line is so bad loool
                    val extractedUsername = JSONObject(JSONObject(JSONArray(response.body()?.data.toString())[0].toString()).get("fields").toString()).get("username").toString()
+                   val extractedPk = JSONObject(JSONArray(response.body()?.data.toString())[0].toString()).get("pk").toString()
 
                     with(sharedPref?.edit()) {
                         this?.putString("session", extractedUsername)
+                        this?.putString("id", extractedPk)
                         this?.apply()
                     }
 

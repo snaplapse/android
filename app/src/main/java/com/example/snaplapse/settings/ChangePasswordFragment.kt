@@ -2,6 +2,7 @@ package com.example.snaplapse.settings
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -9,9 +10,15 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.lifecycle.lifecycleScope
 import com.example.snaplapse.R
+import com.example.snaplapse.api.RetrofitHelper
+import com.example.snaplapse.api.UsersApi
+import com.example.snaplapse.api.data.user.UserCredentialsRequest
 
 class ChangePasswordFragment : Fragment() {
+
+    private val usersApi = RetrofitHelper.getInstance().create(UsersApi::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,7 +38,7 @@ class ChangePasswordFragment : Fragment() {
         val confirmButton = view.findViewById<Button>(R.id.change_password_confirm)
         val sharedPref = activity?.getSharedPreferences(getString(R.string.preferences_file_key), Context.MODE_PRIVATE)
 
-        val username = sharedPref?.getString("session", "")
+        val id = sharedPref?.getString("id", "").toString()
 
         backButton.setOnClickListener {
             parentFragmentManager.popBackStack()
@@ -52,13 +59,26 @@ class ChangePasswordFragment : Fragment() {
             }
 
             if (!hasErrors) {
-                with(sharedPref?.edit()) {
-                    this?.putString(username, passwordText)
-                    this?.apply()
-                }
-                parentFragmentManager.popBackStack()
+                changePassword(id, passwordText)
             }
         }
         return view
+    }
+
+    private fun changePassword(id: String, password: String) {
+        lifecycleScope.launchWhenCreated {
+            try {
+                val requestBody = UserCredentialsRequest(username="", secret=password)
+                val response = usersApi.edit(id, requestBody)
+                if (response.isSuccessful) {
+                    parentFragmentManager.popBackStack()
+                }
+                else {
+                    // TODO: password validation code
+                }
+            } catch (e: Exception) {
+                Log.e("ChangePasswordError", e.toString())
+            }
+        }
     }
 }

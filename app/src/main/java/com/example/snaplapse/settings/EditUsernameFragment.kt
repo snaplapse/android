@@ -2,7 +2,9 @@ package com.example.snaplapse.settings
 
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -11,18 +13,26 @@ import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import com.example.snaplapse.MainActivity
 import com.example.snaplapse.R
+import com.example.snaplapse.api.RetrofitHelper
+import com.example.snaplapse.api.UsersApi
+import com.example.snaplapse.api.data.user.UserCredentialsRequest
 import java.text.SimpleDateFormat
 import java.util.*
 
 class EditUsernameFragment : Fragment() {
+
+    private val usersApi = RetrofitHelper.getInstance().create(UsersApi::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
         }
     }
+
+    var sharedPref: SharedPreferences? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,9 +44,9 @@ class EditUsernameFragment : Fragment() {
         val username: TextView = view.findViewById(R.id.edit_username_input)
         val backButton: ImageButton = view.findViewById(R.id.edit_username_back_button)
         val confirmButton: Button = view.findViewById(R.id.edit_username_confirm_button)
-        val sharedPref = activity?.getSharedPreferences(getString(R.string.preferences_file_key), Context.MODE_PRIVATE)
+        sharedPref = activity?.getSharedPreferences(getString(R.string.preferences_file_key), Context.MODE_PRIVATE)
 
-        val originalUsername = sharedPref?.getString("session", "")
+        val id = sharedPref?.getString("id", "").toString()
 
         backButton.setOnClickListener {
             parentFragmentManager.popBackStack()
@@ -59,20 +69,31 @@ class EditUsernameFragment : Fragment() {
             }
 
             if (!hasErrors) {
-                val password = sharedPref?.getString(sharedPref?.getString("session", ""), "")
-
-                with(sharedPref?.edit()) {
-                    this?.remove(originalUsername)
-                    this?.putString(usernameText, password)
-                    this?.putString("session", usernameText)
-                    this?.apply()
-                }
-
-                parentFragmentManager.popBackStack()
-
+                changeUsername(id, usernameText)
             }
         }
 
         return view
+    }
+
+    private fun changeUsername(id: String, username: String) {
+        lifecycleScope.launchWhenCreated {
+            try {
+                val requestBody = UserCredentialsRequest(username=username, secret="")
+                val response = usersApi.edit(id, requestBody)
+                if (response.isSuccessful) {
+                    with(sharedPref?.edit()) {
+                        this?.putString("session", username)
+                        this?.apply()
+                    }
+                    parentFragmentManager.popBackStack()
+                }
+                else {
+                    // TODO: username validation code
+                }
+            } catch (e: Exception) {
+                Log.e("ChangeUsernameError", e.toString())
+            }
+        }
     }
 }

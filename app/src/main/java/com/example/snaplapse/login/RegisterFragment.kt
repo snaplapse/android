@@ -11,18 +11,17 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.snaplapse.MainActivity
 import com.example.snaplapse.R
 import com.example.snaplapse.api.RetrofitHelper
 import com.example.snaplapse.api.UsersApi
-import com.example.snaplapse.api.data.UserCredentialsRequest
+import com.example.snaplapse.api.data.user.UserCredentialsRequest
 
 class RegisterFragment : Fragment() {
 
-    private val userListApi = RetrofitHelper.getInstance().create(UsersApi::class.java)
+    private val usersApi = RetrofitHelper.getInstance().create(UsersApi::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,7 +85,7 @@ class RegisterFragment : Fragment() {
         lifecycleScope.launchWhenCreated {
             try {
                 val requestBody = UserCredentialsRequest(username=username, secret=password)
-                val response = userListApi.register(requestBody)
+                val response = usersApi.register(requestBody)
                 if (response.isSuccessful) {
                     with(sharedPref?.edit()) {
                         this?.putString("session", response.body()?.username)
