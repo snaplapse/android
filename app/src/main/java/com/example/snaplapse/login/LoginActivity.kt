@@ -6,15 +6,14 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.example.snaplapse.MainActivity
 import com.example.snaplapse.R
-
 class LoginActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val sharedPref = this.getSharedPreferences(getString(R.string.preferences_file_key), Context.MODE_PRIVATE)
         if (sharedPref.contains("session")) {
             val intent = Intent(this, MainActivity::class.java)
-            intent.putExtra("username", sharedPref.getString("session", ""))
             startActivity(intent)
         }
 
