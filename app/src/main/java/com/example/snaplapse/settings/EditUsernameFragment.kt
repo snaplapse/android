@@ -1,7 +1,6 @@
 package com.example.snaplapse.settings
 
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
@@ -12,15 +11,11 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.TextView
-import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
-import com.example.snaplapse.MainActivity
 import com.example.snaplapse.R
 import com.example.snaplapse.api.RetrofitHelper
-import com.example.snaplapse.api.UsersApi
+import com.example.snaplapse.api.routes.UsersApi
 import com.example.snaplapse.api.data.user.UserCredentialsRequest
-import java.text.SimpleDateFormat
-import java.util.*
 
 class EditUsernameFragment : Fragment() {
 
@@ -79,7 +74,7 @@ class EditUsernameFragment : Fragment() {
     private fun changeUsername(id: String, username: String) {
         lifecycleScope.launchWhenCreated {
             try {
-                val requestBody = UserCredentialsRequest(username=username, secret="")
+                val requestBody = UserCredentialsRequest(username=username, secret=null)
                 val response = usersApi.edit(id, requestBody)
                 if (response.isSuccessful) {
                     with(sharedPref?.edit()) {
@@ -89,6 +84,7 @@ class EditUsernameFragment : Fragment() {
                     parentFragmentManager.popBackStack()
                 }
                 else {
+
                     // TODO: username validation code
                 }
             } catch (e: Exception) {

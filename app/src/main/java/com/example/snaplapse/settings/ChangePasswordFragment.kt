@@ -13,7 +13,7 @@ import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
 import com.example.snaplapse.R
 import com.example.snaplapse.api.RetrofitHelper
-import com.example.snaplapse.api.UsersApi
+import com.example.snaplapse.api.routes.UsersApi
 import com.example.snaplapse.api.data.user.UserCredentialsRequest
 
 class ChangePasswordFragment : Fragment() {
@@ -68,7 +68,7 @@ class ChangePasswordFragment : Fragment() {
     private fun changePassword(id: String, password: String) {
         lifecycleScope.launchWhenCreated {
             try {
-                val requestBody = UserCredentialsRequest(username="", secret=password)
+                val requestBody = UserCredentialsRequest(username=null, secret=password)
                 val response = usersApi.edit(id, requestBody)
                 if (response.isSuccessful) {
                     parentFragmentManager.popBackStack()

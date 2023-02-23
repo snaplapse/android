@@ -16,7 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.snaplapse.MainActivity
 import com.example.snaplapse.R
 import com.example.snaplapse.api.RetrofitHelper
-import com.example.snaplapse.api.UsersApi
+import com.example.snaplapse.api.routes.UsersApi
 import com.example.snaplapse.api.data.user.UserCredentialsRequest
 
 class RegisterFragment : Fragment() {
@@ -89,6 +89,7 @@ class RegisterFragment : Fragment() {
                 if (response.isSuccessful) {
                     with(sharedPref?.edit()) {
                         this?.putString("session", response.body()?.username)
+                        this?.putString("id", response.body()?.id.toString())
                         this?.apply()
                     }
 

@@ -16,7 +16,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.snaplapse.MainActivity
 import com.example.snaplapse.R
 import com.example.snaplapse.api.RetrofitHelper
-import com.example.snaplapse.api.UsersApi
+import com.example.snaplapse.api.routes.UsersApi
 import com.example.snaplapse.api.data.user.UserCredentialsRequest
 import org.json.JSONArray
 import org.json.JSONObject
