@@ -31,7 +31,7 @@ import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 
-class MapFragment : Fragment(), OnMapReadyCallback {
+class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
     private lateinit var safeContext: Context
 
     private lateinit var map: GoogleMap
@@ -102,17 +102,32 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 return infoWindow
             }
         })
-        map.setOnPoiClickListener { poi ->
-            Toast.makeText(safeContext, poi.name, Toast.LENGTH_SHORT).show()
-            val transaction = parentFragmentManager.beginTransaction()
-            transaction.replace(R.id.fragmentContainerView, TimelineFragment())
-            transaction.addToBackStack(null)
-            transaction.commit()
-        }
+
+        // Set a listener for marker click.
+        map.setOnMarkerClickListener(this)
+
         getLocationPermission()
         updateLocationUI()
         getDeviceLocation()
         showCurrentPlace()
+        showPlaceMarkers()
+    }
+
+    /** Called when the user clicks a marker.  */
+    override fun onMarkerClick(marker: Marker): Boolean {
+
+        // need to add another page to view all the posts at the clicked location
+        Toast.makeText(safeContext, "test", Toast.LENGTH_SHORT).show()
+        val transaction = parentFragmentManager.beginTransaction()
+        transaction.replace(R.id.fragmentContainerView, TimelineFragment())
+        transaction.addToBackStack(null)
+        transaction.commit()
+
+
+
+        // Return false to indicate that we have not consumed the event and that we wish
+        // for the default behavior to occur
+        return false
     }
 
     @SuppressLint("MissingPermission")
@@ -227,6 +242,28 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     @SuppressLint("MissingPermission")
+    private fun showPlaceMarkers() {
+        //need to request the current locations stored with posts and use latLng to add markers
+        val markerPositions = mutableListOf<LatLng>()
+
+        val marker1 = LatLng(37.4221, -122.0820)
+        markerPositions.add(marker1)
+        val marker2 = LatLng(37.4268, -122.0807)
+        markerPositions.add(marker2)
+
+        //loop through each location retrived and add marker
+        for (m in markerPositions) {
+            var place = map.addMarker(
+                MarkerOptions()
+                    .position(m)
+                    .title("test") // this is just temporary until we put actual data in
+            )
+            place?.tag = "location_id" //use the location id here to reference the location when clicked
+        }
+
+    }
+
+        @SuppressLint("MissingPermission")
     private fun updateLocationUI() {
         if (locationPermissionGranted) {
             map.isMyLocationEnabled = true
