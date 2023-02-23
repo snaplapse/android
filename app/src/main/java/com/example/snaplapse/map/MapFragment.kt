@@ -1,4 +1,4 @@
-package com.example.snaplapse
+package com.example.snaplapse.map
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
-import android.view.*
 import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -18,6 +17,9 @@ import com.google.android.gms.location.LocationServices
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.example.snaplapse.BuildConfig
+import com.example.snaplapse.R
+import com.example.snaplapse.timeline.TimelineFragment
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -93,7 +95,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
 
             override fun getInfoContents(marker: Marker): View {
                 // Inflate the layouts for the info window, title and snippet.
-                val infoWindow = layoutInflater.inflate(R.layout.custom_info_contents,
+                val infoWindow = layoutInflater.inflate(
+                    R.layout.custom_info_contents,
                     requireActivity().findViewById<FrameLayout>(R.id.map), false)
                 val title = infoWindow.findViewById<TextView>(R.id.title)
                 title.text = marker.title
@@ -152,7 +155,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
             locationPermissionGranted = true
         } else {
             ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION)
+                PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION
+            )
         }
     }
 

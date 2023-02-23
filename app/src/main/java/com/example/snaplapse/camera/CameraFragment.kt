@@ -1,4 +1,4 @@
-package com.example.snaplapse
+package com.example.snaplapse.camera
 
 import android.Manifest
 import android.content.Context
@@ -8,10 +8,8 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Surface
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.*
@@ -19,8 +17,9 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
+import com.example.snaplapse.R
 import com.example.snaplapse.databinding.FragmentCameraBinding
+import com.example.snaplapse.view_models.CameraViewModel
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 

@@ -95,10 +95,12 @@ class LoginFragment : Fragment() {
                    // this line is so bad loool
                    val extractedUsername = JSONObject(JSONObject(JSONArray(response.body()?.data.toString())[0].toString()).get("fields").toString()).get("username").toString()
                    val extractedPk = JSONObject(JSONArray(response.body()?.data.toString())[0].toString()).get("pk").toString()
+                   val extractedJoinDate = JSONObject(JSONObject(JSONArray(response.body()?.data.toString())[0].toString()).get("fields").toString()).get("created").toString()
 
                     with(sharedPref?.edit()) {
                         this?.putString("session", extractedUsername)
-                        this?.putString("id", extractedPk)
+                        this?.putInt("id", extractedPk.toInt())
+                        this?.putString("joined", extractedJoinDate)
                         this?.apply()
                     }
 

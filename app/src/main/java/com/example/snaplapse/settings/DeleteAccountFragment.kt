@@ -42,7 +42,7 @@ class DeleteAccountFragment : Fragment() {
         }
 
         val username = sharedPref?.getString("session", "")
-        val id = sharedPref?.getString("id", "").toString()
+        val id = sharedPref?.getInt("id", 0)!!
         val deleteConfirm: Button = view.findViewById(R.id.delete_account_button_confirm)
         val textInput: EditText = view.findViewById(R.id.delete_account_text_input)
         textInput.hint = username
@@ -64,7 +64,7 @@ class DeleteAccountFragment : Fragment() {
         return view
     }
 
-    private fun deleteAccount(id: String) {
+    private fun deleteAccount(id: Int) {
         lifecycleScope.launchWhenCreated {
             try {
                 val response = usersApi.delete(id)

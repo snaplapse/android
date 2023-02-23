@@ -1,4 +1,4 @@
-package com.example.snaplapse
+package com.example.snaplapse.timeline
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -8,6 +8,9 @@ import android.widget.ImageButton
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.snaplapse.MainActivity
+import com.example.snaplapse.R
+import com.example.snaplapse.view_models.ItemsViewModel
 
 class TimelineFragment : Fragment() {
 
@@ -39,7 +42,7 @@ class TimelineFragment : Fragment() {
             } else {
                 R.drawable.statue_of_liberty2
             }
-            var card = ItemsViewModel(image, (2022 - i).toString())
+            var card = ItemsViewModel(i, 1, image, (2022 - i).toString())
             data.add(card)
         }
 

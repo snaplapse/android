@@ -90,6 +90,7 @@ class RegisterFragment : Fragment() {
                     with(sharedPref?.edit()) {
                         this?.putString("session", response.body()?.username)
                         this?.putString("id", response.body()?.id.toString())
+                        this?.putString("joined", response.body()?.created)
                         this?.apply()
                     }
 

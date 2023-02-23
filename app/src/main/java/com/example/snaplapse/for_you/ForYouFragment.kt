@@ -1,4 +1,4 @@
-package com.example.snaplapse
+package com.example.snaplapse.for_you
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -7,6 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.snaplapse.MainActivity
+import com.example.snaplapse.R
+import com.example.snaplapse.view_models.ForYouViewModel
 
 class ForYouFragment : Fragment() {
 

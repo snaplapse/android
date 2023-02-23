@@ -1,4 +1,4 @@
-package com.example.snaplapse
+package com.example.snaplapse.timeline
 
 import android.view.LayoutInflater
 import android.view.View
@@ -7,6 +7,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.snaplapse.R
+import com.example.snaplapse.image_details.ImageDetailsFragment
+import com.example.snaplapse.view_models.ItemsViewModel
 
 
 class CustomAdapter(private val mList: List<ItemsViewModel>, private val fragmentManager: FragmentManager) : RecyclerView.Adapter<CustomAdapter.ViewHolder>() {
