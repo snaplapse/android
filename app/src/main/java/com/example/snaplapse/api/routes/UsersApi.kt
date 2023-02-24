@@ -17,5 +17,5 @@ interface UsersApi {
     suspend fun edit(@Path("id") id: Int, @Body user: UserCredentialsRequest): Response<User>
 
     @DELETE("/api/users/{id}/")
-    suspend fun delete(@Path("id") id: Int): Response<String>
+    suspend fun delete(@Path("id") id: String): Response<String>
 }

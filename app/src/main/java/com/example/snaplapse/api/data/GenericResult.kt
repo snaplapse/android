@@ -5,4 +5,3 @@ data class GenericResult(
     val message: String,
     val data: String?
 )
-
