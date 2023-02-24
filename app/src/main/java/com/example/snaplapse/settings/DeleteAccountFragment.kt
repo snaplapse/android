@@ -67,7 +67,7 @@ class DeleteAccountFragment : Fragment() {
     private fun deleteAccount(id: Int) {
         lifecycleScope.launchWhenCreated {
             try {
-                val response = usersApi.delete(id)
+                val response = usersApi.delete(id.toString())
                 if (response.isSuccessful) {
                     with(sharedPref?.edit()) {
                         this?.remove("session")

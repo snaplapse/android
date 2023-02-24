@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -21,6 +22,7 @@ import com.example.snaplapse.api.routes.PhotosApi
 import com.example.snaplapse.databinding.FragmentPhotoEditBinding
 import com.example.snaplapse.view_models.CameraViewModel
 import com.example.snaplapse.view_models.ItemsViewModel2
+import java.io.ByteArrayOutputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -75,7 +77,11 @@ class PhotoEditFragment : Fragment() {
         if (description.isBlank()) {
             Toast.makeText(safeContext, "Please provide a description.", Toast.LENGTH_SHORT).show()
         } else {
-            uploadToServer(description)
+            val byteArrayOutputStream = ByteArrayOutputStream()
+            imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
+            val byteArray = byteArrayOutputStream.toByteArray()
+            val encodedBitmap: String = Base64.encodeToString(byteArray, Base64.DEFAULT)
+            uploadToServer(description, encodedBitmap)
         }
     }
 
@@ -86,10 +92,10 @@ class PhotoEditFragment : Fragment() {
     }
 
     @SuppressLint("NewApi")
-    private fun uploadToServer(description: String) {
+    private fun uploadToServer(description: String, encodedBitmap: String) {
         lifecycleScope.launchWhenCreated {
             try {
-                val requestBody = PhotoRequest(user=userID, location=1, description=description)
+                val requestBody = PhotoRequest(user=userID, location=1, description=description, bitmap=encodedBitmap)
                 val response = photosApi.upload(requestBody)
                 if (response.isSuccessful) {
                     Toast.makeText(
