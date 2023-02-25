@@ -1,4 +1,4 @@
-package com.example.snaplapse
+package com.example.snaplapse.profile
 
 import android.content.Context
 import android.os.Bundle
@@ -9,7 +9,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.snaplapse.MainActivity
+import com.example.snaplapse.R
 import com.example.snaplapse.settings.SettingsFragment
+import com.example.snaplapse.view_models.CameraViewModel
+import com.example.snaplapse.view_models.ItemsViewModel2
 
 
 class ProfileFragment : Fragment() {

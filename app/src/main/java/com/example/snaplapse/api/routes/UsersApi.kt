@@ -14,7 +14,7 @@ interface UsersApi {
     suspend fun register(@Body user: UserCredentialsRequest): Response<User>
 
     @PATCH("/api/users/{id}/")
-    suspend fun edit(@Path("id") id: String, @Body user: UserCredentialsRequest): Response<GenericResult>
+    suspend fun edit(@Path("id") id: Int, @Body user: UserCredentialsRequest): Response<User>
 
     @DELETE("/api/users/{id}/")
     suspend fun delete(@Path("id") id: String): Response<String>

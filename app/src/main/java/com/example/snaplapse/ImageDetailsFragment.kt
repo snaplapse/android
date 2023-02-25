@@ -11,6 +11,10 @@ import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.example.snaplapse.image_details.FlagDialogFragment
+import com.example.snaplapse.image_details.OnSwipeTouchListener
+import com.example.snaplapse.view_models.ItemsViewModel
+import com.example.snaplapse.view_models.ItemsViewModel2
 
 class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<ItemsViewModel>, val item2: ItemsViewModel2? = null) : Fragment() {
     override fun onCreateView(

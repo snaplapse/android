@@ -1,17 +1,17 @@
-package com.example.snaplapse
+package com.example.snaplapse.for_you
 
-import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.ScrollView
 import android.widget.TextView
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.snaplapse.R
+import com.example.snaplapse.timeline.TimelineFragment
+import com.example.snaplapse.view_models.ForYouViewModel
 
 class ForYouAdapter(private val mList: List<ForYouViewModel>, private val fragmentManager: FragmentManager) : RecyclerView.Adapter<ForYouAdapter.ViewHolder>() {
 

@@ -21,13 +21,12 @@ class EditUsernameFragment : Fragment() {
 
     private val usersApi = RetrofitHelper.getInstance().create(UsersApi::class.java)
 
+    private var userID: Int = 0
+    private var sharedPref: SharedPreferences? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-        }
     }
-
-    var sharedPref: SharedPreferences? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,7 +40,7 @@ class EditUsernameFragment : Fragment() {
         val confirmButton: Button = view.findViewById(R.id.edit_username_confirm_button)
         sharedPref = activity?.getSharedPreferences(getString(R.string.preferences_file_key), Context.MODE_PRIVATE)
 
-        val id = sharedPref?.getString("id", "").toString()
+        userID = sharedPref?.getInt("id", 0)!!
 
         backButton.setOnClickListener {
             parentFragmentManager.popBackStack()
@@ -58,20 +57,16 @@ class EditUsernameFragment : Fragment() {
                 username?.error = resources.getString(R.string.username_length_error)
                 hasErrors = true
             }
-            else if (sharedPref?.contains(usernameText) == true) {
-                username?.error = resources.getString(R.string.username_exists_error)
-                hasErrors = true
-            }
 
             if (!hasErrors) {
-                changeUsername(id, usernameText)
+                changeUsername(userID, usernameText)
             }
         }
 
         return view
     }
 
-    private fun changeUsername(id: String, username: String) {
+    private fun changeUsername(id: Int, username: String) {
         lifecycleScope.launchWhenCreated {
             try {
                 val requestBody = UserCredentialsRequest(username=username, secret=null)
@@ -84,7 +79,6 @@ class EditUsernameFragment : Fragment() {
                     parentFragmentManager.popBackStack()
                 }
                 else {
-
                     // TODO: username validation code
                 }
             } catch (e: Exception) {

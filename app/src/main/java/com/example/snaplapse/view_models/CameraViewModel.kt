@@ -1,4 +1,4 @@
-package com.example.snaplapse
+package com.example.snaplapse.view_models
 
 import android.graphics.Bitmap
 import androidx.lifecycle.LiveData

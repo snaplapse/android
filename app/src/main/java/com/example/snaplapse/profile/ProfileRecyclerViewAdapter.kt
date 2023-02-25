@@ -1,12 +1,15 @@
-package com.example.snaplapse
+package com.example.snaplapse.profile
 
-import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.example.snaplapse.image_details.ImageDetailsFragment
+import com.example.snaplapse.R
+import com.example.snaplapse.view_models.ItemsViewModel
+import com.example.snaplapse.view_models.ItemsViewModel2
 
 class ProfileRecyclerViewAdapter(private val data: List<ItemsViewModel2>) : RecyclerView.Adapter<ProfileRecyclerViewAdapter.ViewHolder>() {
     private val placeholders = listOf(
@@ -32,7 +35,7 @@ class ProfileRecyclerViewAdapter(private val data: List<ItemsViewModel2>) : Recy
                 val transaction = (holder.itemView.context as FragmentActivity).supportFragmentManager.beginTransaction()
                 transaction.replace(
                     R.id.fragmentContainerView,
-                    ImageDetailsFragment(ItemsViewModel(photo, ""), listOf())
+                    ImageDetailsFragment(ItemsViewModel(position, 1, photo, ""), listOf())
                 )
                 transaction.addToBackStack(null)
                 transaction.commit()
@@ -44,7 +47,7 @@ class ProfileRecyclerViewAdapter(private val data: List<ItemsViewModel2>) : Recy
                 val transaction = (holder.itemView.context as FragmentActivity).supportFragmentManager.beginTransaction()
                 transaction.replace(
                     R.id.fragmentContainerView,
-                    ImageDetailsFragment(ItemsViewModel(0, ""), listOf(), ItemsViewModel2(photo.image, photo.text))
+                    ImageDetailsFragment(ItemsViewModel(position, 1, 0, ""), listOf(), ItemsViewModel2(photo.id, photo.user, photo.image, photo.text))
                 )
                 transaction.addToBackStack(null)
                 transaction.commit()
