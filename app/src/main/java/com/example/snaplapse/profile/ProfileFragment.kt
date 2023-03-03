@@ -21,6 +21,7 @@ import com.example.snaplapse.settings.SettingsFragment
 import com.example.snaplapse.view_models.CameraViewModel
 import com.example.snaplapse.view_models.ItemsViewModel2
 
+
 class ProfileFragment : Fragment() {
     private val viewModel: CameraViewModel by activityViewModels()
     private var usernameText: String? = null
