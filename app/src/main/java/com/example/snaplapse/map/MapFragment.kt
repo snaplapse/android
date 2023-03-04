@@ -49,6 +49,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
     private val defaultLocation = LatLng(-33.8523341, 151.2106085)
     private var locationPermissionGranted = false
 
+    private var marker: Marker? = null
+
     private var lastKnownLocation: Location? = null
 
     private val locationsApi = RetrofitHelper.getInstance().create(LocationsApi::class.java)
@@ -192,6 +194,60 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
             else -> super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         }
         updateLocationUI()
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun showCurrentPlace() {
+        if (locationPermissionGranted) {
+            // Use fields to define the data types to return.
+            val placeFields = listOf(Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG, Place.Field.TYPES, Place.Field.ID)
+
+            // Use the builder to create a FindCurrentPlaceRequest.
+            val request = FindCurrentPlaceRequest.newInstance(placeFields)
+
+            // Get the likely places - that is, the businesses and other points of interest that
+            // are the best match for the device's current location.
+            val placeResult = placesClient.findCurrentPlace(request)
+            placeResult.addOnCompleteListener { task ->
+                if (task.isSuccessful && task.result != null) {
+                    val likelyPlace = task.result.placeLikelihoods[0].place
+                    var markerSnippet = likelyPlace.address
+                    if (likelyPlace.attributions != null) {
+                        markerSnippet = """
+                        $markerSnippet
+                        ${likelyPlace.attributions}
+                        """.trimIndent()
+                    }
+
+                    // Add a marker for the selected place, with an info window
+                    // showing information about that place.
+                    marker?.remove()
+                    marker = map.addMarker(
+                        MarkerOptions()
+                            .title(likelyPlace.name)
+                            .position(likelyPlace.latLng!!)
+                            .snippet(markerSnippet)
+                    )
+
+                    // Position the map's camera at the location of the marker.
+                    map.moveCamera(
+                        CameraUpdateFactory.newLatLngZoom(
+                            likelyPlace.latLng!!,
+                            DEFAULT_ZOOM.toFloat()
+                        )
+                    )
+                }
+            }
+        } else {
+            // Add a default marker, because the user hasn't selected a place.
+            map.addMarker(MarkerOptions()
+                .title("Default Location")
+                .position(defaultLocation)
+                .snippet("No places found, because location permission is disabled."))
+
+            // Prompt the user for permission.
+            getLocationPermission()
+        }
     }
 
     @SuppressLint("MissingPermission")
