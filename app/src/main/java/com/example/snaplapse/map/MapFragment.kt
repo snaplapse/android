@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -17,9 +18,12 @@ import com.google.android.gms.location.LocationServices
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
 import com.example.snaplapse.BuildConfig
 import com.example.snaplapse.R
 import com.example.snaplapse.timeline.TimelineFragment
+import com.example.snaplapse.api.RetrofitHelper
+import com.example.snaplapse.api.routes.LocationsApi
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -33,7 +37,7 @@ import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 
-class MapFragment : Fragment(), OnMapReadyCallback {
+class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
     private lateinit var safeContext: Context
 
     private lateinit var map: GoogleMap
@@ -48,6 +52,8 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     private var marker: Marker? = null
 
     private var lastKnownLocation: Location? = null
+
+    private val locationsApi = RetrofitHelper.getInstance().create(LocationsApi::class.java)
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -105,17 +111,31 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                 return infoWindow
             }
         })
-        map.setOnPoiClickListener { poi ->
-            Toast.makeText(safeContext, poi.name, Toast.LENGTH_SHORT).show()
-            val transaction = parentFragmentManager.beginTransaction()
-            transaction.replace(R.id.fragmentContainerView, TimelineFragment())
-            transaction.addToBackStack(null)
-            transaction.commit()
-        }
+
+        // Set a listener for marker click.
+        map.setOnMarkerClickListener(this)
+
         getLocationPermission()
         updateLocationUI()
         getDeviceLocation()
-        showCurrentPlace()
+        showPlaceMarkers()
+    }
+
+    /** Called when the user clicks a marker.  */
+    override fun onMarkerClick(marker: Marker): Boolean {
+
+        // need to add another page to view all the posts at the clicked location
+        Toast.makeText(safeContext, "test", Toast.LENGTH_SHORT).show()
+        val transaction = parentFragmentManager.beginTransaction()
+        transaction.replace(R.id.fragmentContainerView, TimelineFragment())
+        transaction.addToBackStack(null)
+        transaction.commit()
+
+
+
+        // Return false to indicate that we have not consumed the event and that we wish
+        // for the default behavior to occur
+        return false
     }
 
     @SuppressLint("MissingPermission")
@@ -231,6 +251,30 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     @SuppressLint("MissingPermission")
+    private fun showPlaceMarkers() {
+        lifecycleScope.launchWhenCreated {
+            try {
+                val locResponse = locationsApi.getLocations()
+                val locations = locResponse.body()?.results
+
+                if (locations != null) {
+                    for (location in locations) {
+                        val marker1 = LatLng(location.latitude, location.longitude)
+                        var place = map.addMarker(
+                            MarkerOptions()
+                                .position(marker1)
+                                .title(location.name) // this is just temporary until we put actual data in
+                        )
+                        //place?.tag = "location_id" //use the location id here to reference the location when clicked
+                    }
+                }
+            }catch (e: Exception) {
+                Log.e("MapError", e.toString())
+            }
+        }
+    }
+
+        @SuppressLint("MissingPermission")
     private fun updateLocationUI() {
         if (locationPermissionGranted) {
             map.isMyLocationEnabled = true
