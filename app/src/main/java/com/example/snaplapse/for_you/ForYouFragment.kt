@@ -52,16 +52,18 @@ class ForYouFragment : Fragment() {
                 val cards = ArrayList<ForYouViewModel>()
                 if (recommendations != null) {
                     for (location in recommendations) {
-                        val locationResponse = locationsApi.getLocation(location.id)
-                        val firstPhotoId = locationResponse.body()?.photos?.get(0) // need to make MOST RECENT photo
+                        val photosResponse = photosApi.getPhotosByLocation(location.id, "-created")
+                        val photos = photosResponse.body()?.results
+                        if (photos?.isNotEmpty() == true) {
+                            val mostRecentPhoto = photos[0]
+                            val bmpRaw = mostRecentPhoto?.bitmap
+                            val imageBytes = Base64.decode(bmpRaw, 0)
+                            var image =
+                                BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
 
-                        val photosResponse = photosApi.getPhoto(firstPhotoId)
-                        val bmpRaw = photosResponse.body()?.bitmap
-                        val imageBytes = Base64.decode(bmpRaw, 0)
-                        var image = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-
-                        val card = ForYouViewModel(image, location.name)
-                        cards.add(card)
+                            val card = ForYouViewModel(image, location.name)
+                            cards.add(card)
+                        }
                     }
                 }
 
