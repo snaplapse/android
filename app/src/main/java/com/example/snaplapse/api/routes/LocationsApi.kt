@@ -1,7 +1,7 @@
 package com.example.snaplapse.api.routes
 
 import com.example.snaplapse.api.data.location.LocationsResponse
-import com.example.snaplapse.api.data.photo.LocationResponse
+import com.example.snaplapse.api.data.location.LocationResponse
 import retrofit2.Response
 import retrofit2.http.*
 
