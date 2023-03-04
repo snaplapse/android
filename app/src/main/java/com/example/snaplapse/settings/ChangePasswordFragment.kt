@@ -20,10 +20,10 @@ class ChangePasswordFragment : Fragment() {
 
     private val usersApi = RetrofitHelper.getInstance().create(UsersApi::class.java)
 
+    private var userID: Int = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-        }
     }
 
     override fun onCreateView(
@@ -36,9 +36,8 @@ class ChangePasswordFragment : Fragment() {
         val confirmPassword = view.findViewById<TextView>(R.id.change_password_input_confirm)
         val backButton = view.findViewById<ImageButton>(R.id.change_password_back_button)
         val confirmButton = view.findViewById<Button>(R.id.change_password_confirm)
-        val sharedPref = activity?.getSharedPreferences(getString(R.string.preferences_file_key), Context.MODE_PRIVATE)
 
-        val id = sharedPref?.getString("id", "").toString()
+        userID = activity?.getSharedPreferences(getString(R.string.preferences_file_key), Context.MODE_PRIVATE)?.getInt("id", 0)!!
 
         backButton.setOnClickListener {
             parentFragmentManager.popBackStack()
@@ -59,13 +58,13 @@ class ChangePasswordFragment : Fragment() {
             }
 
             if (!hasErrors) {
-                changePassword(id, passwordText)
+                changePassword(userID, passwordText)
             }
         }
         return view
     }
 
-    private fun changePassword(id: String, password: String) {
+    private fun changePassword(id: Int, password: String) {
         lifecycleScope.launchWhenCreated {
             try {
                 val requestBody = UserCredentialsRequest(username=null, secret=password)

@@ -1,4 +1,4 @@
-package com.example.snaplapse
+package com.example.snaplapse.image_details
 
 import android.content.Context
 import android.view.GestureDetector
@@ -8,7 +8,8 @@ import android.view.View
 import android.view.View.OnTouchListener
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
+import com.example.snaplapse.R
+import com.example.snaplapse.view_models.ItemsViewModel
 import kotlin.math.abs
 
 

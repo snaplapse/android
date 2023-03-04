@@ -20,6 +20,8 @@ class LogOutDialogFragment : DialogFragment() {
                 .setPositiveButton(R.string.log_out_dialog_confirm, DialogInterface.OnClickListener { dialog, id ->
                     with(sharedPref?.edit()) {
                         this?.remove("session")
+                        this?.remove("id")
+                        this?.remove("joined")
                         this?.apply()
                     }
                     val intent = Intent(activity, LoginActivity::class.java)

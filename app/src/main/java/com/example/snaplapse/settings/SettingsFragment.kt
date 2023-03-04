@@ -1,5 +1,6 @@
 package com.example.snaplapse.settings
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Build
@@ -13,6 +14,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.snaplapse.R
+import java.time.format.DateTimeFormatter
 
 class SettingsFragment : Fragment() {
 
@@ -32,6 +34,9 @@ class SettingsFragment : Fragment() {
         val sharedPref = activity?.getSharedPreferences(getString(R.string.preferences_file_key), Context.MODE_PRIVATE)
         val usernameView: TextView = view.findViewById(R.id.settings_username)
         usernameView.text = sharedPref?.getString("session", "")
+
+        val joinedView: TextView = view.findViewById(R.id.date_joined_text)
+        joinedView.text = sharedPref?.getString("joined", "")
 
         val changeAvatarButton: Button = view.findViewById(R.id.change_avatar_button)
         changeAvatarButton.setOnClickListener {

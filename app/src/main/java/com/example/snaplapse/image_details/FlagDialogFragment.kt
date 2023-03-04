@@ -1,4 +1,4 @@
-package com.example.snaplapse
+package com.example.snaplapse.image_details
 
 import android.app.AlertDialog
 import android.app.Dialog
@@ -6,6 +6,7 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
+import com.example.snaplapse.R
 
 class FlagDialogFragment : DialogFragment() {
 
