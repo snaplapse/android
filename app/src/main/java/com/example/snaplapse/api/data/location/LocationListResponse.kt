@@ -1,6 +1,6 @@
 package com.example.snaplapse.api.data.location
 
-data class LocationsResponse(
+data class LocationListResponse(
     val count: Int,
     val next: Any,
     val previous: Any,
