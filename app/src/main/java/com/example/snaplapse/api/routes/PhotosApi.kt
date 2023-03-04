@@ -4,12 +4,13 @@ import com.example.snaplapse.api.data.photo.PhotoActionRequest
 import com.example.snaplapse.api.data.photo.PhotoActionResponse
 import com.example.snaplapse.api.data.photo.PhotoRequest
 import com.example.snaplapse.api.data.photo.PhotoResponse
+import com.example.snaplapse.api.data.photo.PhotoListResponse
 import retrofit2.Response
 import retrofit2.http.*
 
 interface PhotosApi {
     @GET("/api/photos/")
-    suspend fun getPhotosByUser(): Response<String>
+    suspend fun getPhotosByUser(@Query("user") user: Int): Response<PhotoListResponse>
 
     @GET("/api/photos/{id}")
     suspend fun getPhoto(@Path("id") id: Int?): Response<PhotoResponse>

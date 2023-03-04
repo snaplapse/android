@@ -8,5 +8,5 @@ data class PhotoResponse(
     val flags: Array<Int>,
     val likes: Array<Int>,
     val visible: Boolean,
-    val bitmap: String
+    val bitmap: String,
 )
