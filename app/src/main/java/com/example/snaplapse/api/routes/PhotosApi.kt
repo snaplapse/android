@@ -12,6 +12,9 @@ interface PhotosApi {
     @GET("/api/photos/")
     suspend fun getPhotosByUser(@Query("user") user: Int): Response<PhotoListResponse>
 
+    @GET("/api/photos/{id}")
+    suspend fun getPhoto(@Path("id") id: Int?): Response<PhotoResponse>
+
     @POST("/api/photos/")
     suspend fun upload(@Body photo: PhotoRequest): Response<PhotoResponse>
 

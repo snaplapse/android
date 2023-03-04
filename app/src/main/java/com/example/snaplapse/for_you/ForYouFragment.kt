@@ -1,20 +1,32 @@
 package com.example.snaplapse.for_you
 
+import android.content.Context
+import android.graphics.BitmapFactory
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Base64
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.snaplapse.MainActivity
 import com.example.snaplapse.R
+import com.example.snaplapse.api.RetrofitHelper
+import com.example.snaplapse.api.routes.LocationsApi
+import com.example.snaplapse.api.routes.PhotosApi
 import com.example.snaplapse.view_models.ForYouViewModel
 
 class ForYouFragment : Fragment() {
+    private val locationsApi = RetrofitHelper.getInstance().create(LocationsApi::class.java)
+    private val photosApi = RetrofitHelper.getInstance().create(PhotosApi::class.java)
+    private var userID: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        userID = activity?.getSharedPreferences(getString(R.string.preferences_file_key), Context.MODE_PRIVATE)?.getInt("id", 0)!!
     }
 
     override fun onCreateView(
@@ -23,28 +35,42 @@ class ForYouFragment : Fragment() {
     ): View {
         // Inflate the layout for this fragment
         val view:View = inflater.inflate(R.layout.fragment_for_you, container, false)
-
-        val recyclerView = view.findViewById<RecyclerView>(R.id.for_you_view)
-
-        recyclerView.layoutManager = LinearLayoutManager(MainActivity())
-
-        val data = ArrayList<ForYouViewModel>()
-        val recommendedSpots = ArrayList<Int>()
-        recommendedSpots.add(R.drawable.starbucks_waterloo)
-        recommendedSpots.add(R.drawable.tims_waterloo)
-        recommendedSpots.add(R.drawable.williams_waterloo)
-        val card = ForYouViewModel(recommendedSpots, "Coffee Shop")
-        data.add(card)
-
-        val recommendedSpots2 = ArrayList<Int>()
-        recommendedSpots2.add(R.drawable.statue_of_liberty)
-        recommendedSpots2.add(R.drawable.cn_tower)
-        val card2 = ForYouViewModel(recommendedSpots2, "Tourist Attraction")
-        data.add(card2)
-
-        val adapter = ForYouAdapter(data, parentFragmentManager)
-        recyclerView.adapter = adapter
-
+        recommendations(view)
         return view
+    }
+
+    private fun recommendations(view: View) {
+        lifecycleScope.launchWhenCreated {
+            try {
+                val recyclerView = view.findViewById<RecyclerView>(R.id.for_you_view)
+                recyclerView.layoutManager = LinearLayoutManager(MainActivity())
+
+                val coordinates = "43.4723,-80.5449" // replace with real location
+                val recResponse = locationsApi.getRecommendations(userID, coordinates, 5000.0, 10)
+                val recommendations = recResponse.body()?.results
+
+                val cards = ArrayList<ForYouViewModel>()
+                if (recommendations != null) {
+                    for (location in recommendations) {
+                        val locationResponse = locationsApi.getLocation(location.id)
+                        val firstPhotoId = locationResponse.body()?.photos?.get(0) // need to make MOST RECENT photo
+
+                        val photosResponse = photosApi.getPhoto(firstPhotoId)
+                        val bmpRaw = photosResponse.body()?.bitmap
+                        val imageBytes = Base64.decode(bmpRaw, 0)
+                        var image = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+
+                        val card = ForYouViewModel(image, location.name)
+                        cards.add(card)
+                    }
+                }
+
+                val adapter = ForYouAdapter(cards, parentFragmentManager)
+                recyclerView.adapter = adapter
+
+            } catch (e: Exception) {
+                Log.e("ForYouPageError", e.toString())
+            }
+        }
     }
 }
