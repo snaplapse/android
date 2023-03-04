@@ -29,33 +29,30 @@ class ForYouAdapter(private val mList: List<ForYouViewModel>, private val fragme
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
         val forYouViewModel = mList[position]
-        for (i in 0 until forYouViewModel.thumbnail.size) {
-            val imageView = ImageView(holder.linearLayout.context)
-            imageView.setImageResource(forYouViewModel.thumbnail[i])
-            imageView.setOnClickListener{
-                val timelineFragment = TimelineFragment()
-                val fragmentTransaction = fragmentManager.beginTransaction()
-                fragmentTransaction.replace(R.id.fragmentContainerView, timelineFragment)
-                fragmentTransaction.addToBackStack(null)
-                fragmentTransaction.commit()
-            }
-            imageView.scaleType = ImageView.ScaleType.CENTER_INSIDE
-            imageView.adjustViewBounds = true
-            val params = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.WRAP_CONTENT,
-                LinearLayout.LayoutParams.MATCH_PARENT
-            ).apply {
-                weight = 1.0f
-                gravity = Gravity.LEFT
-            }
-            params.height = 1000
-            imageView.layoutParams = params
-
-            holder.linearLayout.addView(imageView)
+        val imageView = ImageView(holder.linearLayout.context)
+        imageView.setImageBitmap(forYouViewModel.thumbnail)
+        imageView.setOnClickListener{
+            val timelineFragment = TimelineFragment()
+            val fragmentTransaction = fragmentManager.beginTransaction()
+            fragmentTransaction.replace(R.id.fragmentContainerView, timelineFragment)
+            fragmentTransaction.addToBackStack(null)
+            fragmentTransaction.commit()
         }
+        imageView.scaleType = ImageView.ScaleType.CENTER_INSIDE
+        imageView.adjustViewBounds = true
+        val params = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.MATCH_PARENT
+        ).apply {
+            weight = 1.0f
+            gravity = Gravity.LEFT
+        }
+        params.height = 1000
+        imageView.layoutParams = params
 
-        // sets the text to the textview from our itemHolder class
-        holder.textView.text = forYouViewModel.tag
+        holder.linearLayout.addView(imageView)
+
+        holder.textView.text = forYouViewModel.name
     }
 
     // return the number of the items in the list
