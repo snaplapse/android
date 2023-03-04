@@ -10,7 +10,12 @@ import retrofit2.http.*
 
 interface PhotosApi {
     @GET("/api/photos/")
-    suspend fun getPhotosByUser(@Query("user") user: Int): Response<PhotoListResponse>
+    suspend fun getPhotosByUser(@Query("user") user: Int,
+                                @Query("sort_by") sortBy: String? = null): Response<PhotoListResponse>
+
+    @GET("/api/photos/")
+    suspend fun getPhotosByLocation(@Query("location") user: Int,
+                                      @Query("sort_by") sortBy: String? = null): Response<PhotoListResponse>
 
     @GET("/api/photos/{id}")
     suspend fun getPhoto(@Path("id") id: Int?): Response<PhotoResponse>
