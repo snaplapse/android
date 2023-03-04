@@ -1,6 +1,7 @@
 package com.example.snaplapse.camera
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -14,12 +15,19 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.example.snaplapse.BuildConfig
 import com.example.snaplapse.R
 import com.example.snaplapse.databinding.FragmentCameraBinding
 import com.example.snaplapse.view_models.CameraViewModel
+import com.example.snaplapse.view_models.CurrentPlaceViewModel
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.Place
+import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest
+import com.google.android.libraries.places.api.net.PlacesClient
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -35,6 +43,8 @@ class CameraFragment : Fragment() {
     private var imageCapture: ImageCapture? = null
     private var camera: Camera? = null
     private lateinit var cameraExecutor: ExecutorService
+    private lateinit var placesClient: PlacesClient
+    private var locationPermissionGranted = false
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -45,6 +55,8 @@ class CameraFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        getLocationPermission()
+
         _binding = FragmentCameraBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -92,6 +104,7 @@ class CameraFragment : Fragment() {
         }, ContextCompat.getMainExecutor(safeContext))
     }
 
+    @SuppressLint("MissingPermission")
     private fun takePhoto() {
         val imageCapture = imageCapture ?: return
         imageCapture.takePicture(ContextCompat.getMainExecutor(safeContext), object : ImageCapture.OnImageCapturedCallback() {
@@ -111,17 +124,58 @@ class CameraFragment : Fragment() {
                     true
                 )
                 viewModel.setImageBitmap(imageBitmap)
-                val transaction = parentFragmentManager.beginTransaction()
-                transaction.add(R.id.fragmentContainerView, PhotoEditFragment())
-                transaction.commit()
-                image.close()
-            }
 
+                if (locationPermissionGranted) {
+                    Places.initialize(safeContext, BuildConfig.MAPS_API_KEY)
+                    placesClient = Places.createClient(safeContext)
+
+                    // Use fields to define the data types to return.
+                    val placeFields = listOf(Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG, Place.Field.TYPES, Place.Field.ID)
+
+                    // Use the builder to create a FindCurrentPlaceRequest.
+                    val request = FindCurrentPlaceRequest.newInstance(placeFields)
+
+                    // Get the likely places - that is, the businesses and other points of interest that
+                    // are the best match for the device's current location.
+                    val placeResult = placesClient.findCurrentPlace(request)
+                    placeResult.addOnCompleteListener { task ->
+                        if (task.isSuccessful && task.result != null) {
+                            val likelyPlace = task.result.placeLikelihoods[0].place
+                            val transaction = parentFragmentManager.beginTransaction()
+                            transaction.add(R.id.fragmentContainerView,
+                                PhotoEditFragment(CurrentPlaceViewModel(likelyPlace.name, likelyPlace.address, likelyPlace.id, likelyPlace.latLng.latitude, likelyPlace.latLng.longitude, likelyPlace.types))
+                            )
+                            transaction.commit()
+                            image.close()
+                        }
+                    }
+                } else {
+                    getLocationPermission()
+                }
+            }
             override fun onError(exception: ImageCaptureException) {}
         })
     }
 
+    private fun getLocationPermission() {
+        /*
+         * Request location permission, so that we can get the location of the
+         * device. The result of the permission request is handled by a callback,
+         * onRequestPermissionsResult.
+         */
+        if (ContextCompat.checkSelfPermission(safeContext,
+                Manifest.permission.ACCESS_FINE_LOCATION)
+            == PackageManager.PERMISSION_GRANTED) {
+            locationPermissionGranted = true
+        } else {
+            ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION
+            )
+        }
+    }
+
     companion object {
         private val REQUIRED_PERMISSIONS = arrayOf(Manifest.permission.CAMERA)
+        private const val PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1
     }
 }
