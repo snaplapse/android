@@ -96,7 +96,7 @@ class PhotoEditFragment(var currentPlaceViewModel: CurrentPlaceViewModel) : Frag
             val byteArrayOutputStream = ByteArrayOutputStream()
             imageBitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)
             val byteArray = byteArrayOutputStream.toByteArray()
-            val encodedBitmap: String = Base64.encodeToString(byteArray, Base64.DEFAULT)
+            val encodedBitmap: String = Base64.encodeToString(byteArray, Base64.NO_WRAP)
             uploadToServer(description, encodedBitmap)
         }
     }
