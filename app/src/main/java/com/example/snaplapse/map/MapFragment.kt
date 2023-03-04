@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
+import android.util.Log
 import android.widget.FrameLayout
 import android.widget.TextView
 import android.widget.Toast
@@ -17,9 +18,12 @@ import com.google.android.gms.location.LocationServices
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.lifecycleScope
 import com.example.snaplapse.BuildConfig
 import com.example.snaplapse.R
 import com.example.snaplapse.timeline.TimelineFragment
+import com.example.snaplapse.api.RetrofitHelper
+import com.example.snaplapse.api.routes.LocationsApi
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -45,9 +49,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
     private val defaultLocation = LatLng(-33.8523341, 151.2106085)
     private var locationPermissionGranted = false
 
-    private var marker: Marker? = null
-
     private var lastKnownLocation: Location? = null
+
+    private val locationsApi = RetrofitHelper.getInstance().create(LocationsApi::class.java)
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -112,7 +116,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         getLocationPermission()
         updateLocationUI()
         getDeviceLocation()
-        showCurrentPlace()
         showPlaceMarkers()
     }
 
@@ -192,79 +195,27 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
     }
 
     @SuppressLint("MissingPermission")
-    private fun showCurrentPlace() {
-        if (locationPermissionGranted) {
-            // Use fields to define the data types to return.
-            val placeFields = listOf(Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG)
-
-            // Use the builder to create a FindCurrentPlaceRequest.
-            val request = FindCurrentPlaceRequest.newInstance(placeFields)
-
-            // Get the likely places - that is, the businesses and other points of interest that
-            // are the best match for the device's current location.
-            val placeResult = placesClient.findCurrentPlace(request)
-            placeResult.addOnCompleteListener { task ->
-                if (task.isSuccessful && task.result != null) {
-                    val likelyPlace = task.result.placeLikelihoods[0].place
-                    var markerSnippet = likelyPlace.address
-                    if (likelyPlace.attributions != null) {
-                        markerSnippet = """
-                        $markerSnippet
-                        ${likelyPlace.attributions}
-                        """.trimIndent()
-                    }
-
-                    // Add a marker for the selected place, with an info window
-                    // showing information about that place.
-                    marker?.remove()
-                    marker = map.addMarker(
-                        MarkerOptions()
-                            .title(likelyPlace.name)
-                            .position(likelyPlace.latLng!!)
-                            .snippet(markerSnippet)
-                    )
-
-                    // Position the map's camera at the location of the marker.
-                    map.moveCamera(
-                        CameraUpdateFactory.newLatLngZoom(
-                            likelyPlace.latLng!!,
-                            DEFAULT_ZOOM.toFloat()
-                        )
-                    )
-                }
-            }
-        } else {
-            // Add a default marker, because the user hasn't selected a place.
-            map.addMarker(MarkerOptions()
-                .title("Default Location")
-                .position(defaultLocation)
-                .snippet("No places found, because location permission is disabled."))
-
-            // Prompt the user for permission.
-            getLocationPermission()
-        }
-    }
-
-    @SuppressLint("MissingPermission")
     private fun showPlaceMarkers() {
-        //need to request the current locations stored with posts and use latLng to add markers
-        val markerPositions = mutableListOf<LatLng>()
+        lifecycleScope.launchWhenCreated {
+            try {
+                val locResponse = locationsApi.getLocations()
+                val locations = locResponse.body()?.results
 
-        val marker1 = LatLng(37.4221, -122.0820)
-        markerPositions.add(marker1)
-        val marker2 = LatLng(37.4268, -122.0807)
-        markerPositions.add(marker2)
-
-        //loop through each location retrived and add marker
-        for (m in markerPositions) {
-            var place = map.addMarker(
-                MarkerOptions()
-                    .position(m)
-                    .title("test") // this is just temporary until we put actual data in
-            )
-            place?.tag = "location_id" //use the location id here to reference the location when clicked
+                if (locations != null) {
+                    for (location in locations) {
+                        val marker1 = LatLng(location.latitude, location.longitude)
+                        var place = map.addMarker(
+                            MarkerOptions()
+                                .position(marker1)
+                                .title(location.name) // this is just temporary until we put actual data in
+                        )
+                        //place?.tag = "location_id" //use the location id here to reference the location when clicked
+                    }
+                }
+            }catch (e: Exception) {
+                Log.e("MapError", e.toString())
+            }
         }
-
     }
 
         @SuppressLint("MissingPermission")
