@@ -53,13 +53,17 @@ class ForYouFragment : Fragment() {
                 if (recommendations != null) {
                     for (location in recommendations) {
                         val photosResponse = photosApi.getPhotosByLocation(location.id, "-created")
-                        val mostRecentPhoto = photosResponse.body()?.results?.get(0)
-                        val bmpRaw = mostRecentPhoto?.bitmap
-                        val imageBytes = Base64.decode(bmpRaw, 0)
-                        var image = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+                        val photos = photosResponse.body()?.results
+                        if (photos?.isNotEmpty() == true) {
+                            val mostRecentPhoto = photos[0]
+                            val bmpRaw = mostRecentPhoto?.bitmap
+                            val imageBytes = Base64.decode(bmpRaw, 0)
+                            var image =
+                                BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
 
-                        val card = ForYouViewModel(image, location.name)
-                        cards.add(card)
+                            val card = ForYouViewModel(image, location.name)
+                            cards.add(card)
+                        }
                     }
                 }
 
