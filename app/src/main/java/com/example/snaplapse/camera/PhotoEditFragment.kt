@@ -118,18 +118,18 @@ class PhotoEditFragment(var currentPlaceViewModel: CurrentPlaceViewModel) : Frag
                     locationId = locationGetResponse.body()!!.id
                 }
                 else {
-                    val arrays: MutableList<Int> = ArrayList()
+                    val categories: MutableList<Int> = ArrayList()
                     for (item in currentPlaceViewModel.types) {
-                        val categoryGetResponse = categoriesApi.getCategoryByName(item.toString())
+                        val categoryGetResponse = categoriesApi.getCategoryByName(item)
                         if (categoryGetResponse.isSuccessful) {
-                            arrays.add(categoryGetResponse.body()!!.id)
+                            categories.add(categoryGetResponse.body()!!.id)
                         }
                         else {
                             if (categoryGetResponse.code() == 404) {
-                                val categoryRequestBody = CategoryRequest(name=item.toString())
+                                val categoryRequestBody = CategoryRequest(name=item)
                                 val categoryPostResponse = categoriesApi.createCategory(categoryRequestBody)
                                 if (categoryPostResponse.isSuccessful) {
-                                    arrays.add(categoryPostResponse.body()!!.id)
+                                    categories.add(categoryPostResponse.body()!!.id)
                                 }
                                 else {
                                     Log.i("CategoryPostError", "error")
@@ -141,7 +141,7 @@ class PhotoEditFragment(var currentPlaceViewModel: CurrentPlaceViewModel) : Frag
                         }
                     }
 
-                    val locationRequestBody = LocationRequest(name=currentPlaceViewModel.name, longitude=currentPlaceViewModel.longitude, latitude=currentPlaceViewModel.latitude, categories=arrays, google_id=currentPlaceViewModel.id)
+                    val locationRequestBody = LocationRequest(name=currentPlaceViewModel.name, longitude=currentPlaceViewModel.longitude, latitude=currentPlaceViewModel.latitude, categories=categories, google_id=currentPlaceViewModel.id)
                     val locationPostResponse = locationsApi.createLocation(locationRequestBody)
                     if (locationPostResponse.isSuccessful) {
                         locationId = locationPostResponse.body()!!.id

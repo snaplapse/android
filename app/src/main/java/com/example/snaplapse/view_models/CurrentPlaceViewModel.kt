@@ -8,5 +8,5 @@ data class CurrentPlaceViewModel(
     val id: String,
     val latitude: Double,
     val longitude: Double,
-    val types: List<Place.Type>
+    val types: List<String>
 )

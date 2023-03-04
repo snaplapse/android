@@ -32,6 +32,7 @@
 
     <!-- Camera -->
     <string name="shutter_button">Take Photo</string>
+    <string name="spoof_button">Spoof</string>
     <string name="upload_button">Upload</string>
     <string name="delete_button">Delete</string>
 
