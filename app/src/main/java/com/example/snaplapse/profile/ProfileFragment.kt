@@ -63,9 +63,6 @@ class ProfileFragment : Fragment() {
                     username.text = usernameText
                     val adapter = ProfileRecyclerViewAdapter(data)
                     recyclerview.adapter = adapter
-
-                    val nPostsTextView = view.findViewById<TextView>(R.id.n_posts)
-                    nPostsTextView.text = data.size.toString()
                 }
                 else {
                     // TODO: Error handling
