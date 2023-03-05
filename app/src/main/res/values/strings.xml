@@ -39,6 +39,8 @@
     <!-- Recommender -->
     <string name="recommender_title">For You</string>
     <string name="no_recommendations">Your page looks empty. Like photos to see recommendations.</string>
+    <string name="range_label">Range</string>
+    <string name="km">km</string>
 
     <!-- Flagging -->
     <string name="flag_dialog_title">Report Image</string>

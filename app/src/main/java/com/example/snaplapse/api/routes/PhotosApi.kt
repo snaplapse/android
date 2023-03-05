@@ -20,6 +20,7 @@ interface PhotosApi {
     suspend fun getPhotosByLocation(
         @Query("location") user: Int,
         @Query("sort_by") sortBy: String? = null,
+        @Query("count") count: Int? = null
     ): Response<PhotoListResponse>
 
     @GET("/api/photos/{id}")
