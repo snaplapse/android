@@ -45,6 +45,7 @@ class CameraFragment : Fragment() {
     private val binding get() = _binding
 
     private val viewModel: CameraViewModel by activityViewModels()
+    private val mapsApi = MapHelper.getInstance().create(MapsApi::class.java)
 
     private var preview: Preview? = null
     private var imageCapture: ImageCapture? = null
@@ -146,7 +147,7 @@ class CameraFragment : Fragment() {
                             params["location"] = sb.toString()
                             params["rankby"] = "distance"
 
-                            val mapsResponse = MapHelper.getInstance().create(MapsApi::class.java).getNearbyPlaces(params)
+                            val mapsResponse = mapsApi.getNearbyPlaces(params)
                             if (mapsResponse.isSuccessful) {
                                 val json = JSONObject(mapsResponse.body().toString())
                                 val likelyPlace = JSONObject(json.getJSONArray("results")[0].toString())
@@ -209,17 +210,46 @@ class CameraFragment : Fragment() {
                 if (task.isSuccessful && task.result != null) {
                     val likelyPlace = task.result.placeLikelihoods[0].place
 
-                    val types = ArrayList<String>()
-                    for (i in likelyPlace.types) {
-                        types.add(i.toString())
-                    }
+                    val params = HashMap<String, String>()
+                    params["key"] = BuildConfig.MAPS_API_KEY
+                    params["fields"] = "formatted_address,name,place_id,types,geometry"
+                    params["inputtype"] = "textquery"
+                    params["input"] = likelyPlace.address
 
-                    val transaction = parentFragmentManager.beginTransaction()
-                    transaction.add(R.id.fragmentContainerView,
-                        PhotoEditFragment(CurrentPlaceViewModel(likelyPlace.name, likelyPlace.address, likelyPlace.id, likelyPlace.latLng.latitude, likelyPlace.latLng.longitude, types))
-                    )
-                    transaction.commit()
-                    image.close()
+                    lifecycleScope.launchWhenCreated {
+                        try {
+                            val response = mapsApi.findPlaceFromText(params)
+
+                            if (response.isSuccessful) {
+                                val json = JSONObject(response.body().toString())
+                                val likelyPlace = JSONObject(json.getJSONArray("candidates")[0].toString())
+
+                                val types = ArrayList<String>()
+                                for (i in 0 until likelyPlace.getJSONArray("types").length()) {
+                                    types.add(likelyPlace.getJSONArray("types")[i].toString())
+                                }
+
+                                val transaction = parentFragmentManager.beginTransaction()
+                                transaction.add(R.id.fragmentContainerView,
+                                    PhotoEditFragment(CurrentPlaceViewModel
+                                        (
+                                            likelyPlace.getString("name"),
+                                            likelyPlace.getString("formatted_address"),
+                                            likelyPlace.getString("place_id"),
+                                            likelyPlace.getJSONObject("geometry").getJSONObject("location").getDouble("lat"),
+                                            likelyPlace.getJSONObject("geometry").getJSONObject("location").getDouble("lng"),
+                                            types
+                                        )
+                                    )
+                                )
+                                transaction.commit()
+                                image.close()
+
+                            }
+                        } catch (e: Exception) {
+                            Log.i("FindPlaceError", e.toString())
+                        }
+                    }
                 }
             }
         } else {
