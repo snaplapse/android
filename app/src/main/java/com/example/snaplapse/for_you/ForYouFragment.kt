@@ -105,7 +105,7 @@ class ForYouFragment : Fragment() {
                             var image =
                                 BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
 
-                            val card = ForYouViewModel(image, location.name)
+                            val card = ForYouViewModel(image, location.name, location.id)
                             cards.add(card)
                         }
                     }

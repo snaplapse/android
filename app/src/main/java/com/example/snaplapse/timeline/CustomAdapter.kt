@@ -10,9 +10,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.snaplapse.R
 import com.example.snaplapse.image_details.ImageDetailsFragment
 import com.example.snaplapse.view_models.ItemsViewModel
+import com.example.snaplapse.view_models.ItemsViewModel2
 
 
-class CustomAdapter(private val mList: List<ItemsViewModel>, private val fragmentManager: FragmentManager) : RecyclerView.Adapter<CustomAdapter.ViewHolder>() {
+class CustomAdapter(private val mList: List<ItemsViewModel2>, private val fragmentManager: FragmentManager) : RecyclerView.Adapter<CustomAdapter.ViewHolder>() {
 
     // create new views
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -30,9 +31,9 @@ class CustomAdapter(private val mList: List<ItemsViewModel>, private val fragmen
         val itemsViewModel = mList[position]
 
         // sets the image to the imageview from our itemHolder class
-        holder.imageView.setImageResource(itemsViewModel.image)
+        holder.imageView.setImageBitmap(itemsViewModel.image)
         holder.imageView.setOnClickListener {
-            val imageDetailsFragment = ImageDetailsFragment(itemsViewModel, mList)
+            val imageDetailsFragment = ImageDetailsFragment(ItemsViewModel(position, 1, 0, ""), listOf(), itemsViewModel)
             val fragmentTransaction = fragmentManager.beginTransaction()
             fragmentTransaction.replace(R.id.fragmentContainerView, imageDetailsFragment)
             fragmentTransaction.addToBackStack(null)
