@@ -17,6 +17,10 @@ import com.example.snaplapse.R
 import com.example.snaplapse.api.RetrofitHelper
 import com.example.snaplapse.api.routes.PhotosApi
 import com.example.snaplapse.view_models.ItemsViewModel2
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 class TimelineFragment(val locationId: Int) : Fragment() {
     private val photosApi = RetrofitHelper.getInstance().create(PhotosApi::class.java)
@@ -48,7 +52,10 @@ class TimelineFragment(val locationId: Int) : Fragment() {
                             val decodedBitmap = Base64.decode(photo.bitmap, Base64.DEFAULT)
                             val bitmap =
                                 BitmapFactory.decodeByteArray(decodedBitmap, 0, decodedBitmap.size)
-                            data.add(ItemsViewModel2(photo.id, photo.user, bitmap, photo.description))
+                            val parseFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                            val printFormat = DateTimeFormatter.ofPattern("MMMM dd, yyyy")
+                            val date = LocalDate.parse(photo.created.substring(0, 10), parseFormat)
+                            data.add(ItemsViewModel2(photo.id, photo.user, bitmap, date.format(printFormat).toString()))
                         }
                     }
                     val adapter = CustomAdapter(data, parentFragmentManager)
