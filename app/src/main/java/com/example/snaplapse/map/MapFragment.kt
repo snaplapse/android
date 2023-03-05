@@ -127,7 +127,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         // need to add another page to view all the posts at the clicked location
         Toast.makeText(safeContext, "test", Toast.LENGTH_SHORT).show()
         val transaction = parentFragmentManager.beginTransaction()
-        transaction.replace(R.id.fragmentContainerView, TimelineFragment())
+        transaction.replace(R.id.fragmentContainerView, TimelineFragment(0))
         transaction.addToBackStack(null)
         transaction.commit()
 

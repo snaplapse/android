@@ -27,14 +27,19 @@ class ForYouAdapter(private val mList: List<ForYouViewModel>, private val fragme
 
     // binds the list items to a view
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-
         val forYouViewModel = mList[position]
         val imageView = ImageView(holder.linearLayout.context)
         imageView.setImageBitmap(forYouViewModel.thumbnail)
         imageView.setOnClickListener{
-            val timelineFragment = TimelineFragment()
+            val timelineFragment = TimelineFragment(forYouViewModel.locationId)
             val fragmentTransaction = fragmentManager.beginTransaction()
             fragmentTransaction.replace(R.id.fragmentContainerView, timelineFragment)
+
+//            val transaction = (holder.itemView.context as FragmentActivity).supportFragmentManager.beginTransaction()
+//            transaction.replace(
+//                R.id.fragmentContainerView,
+//                TimelineFragment(forYouViewModel.locationId)
+//            )
             fragmentTransaction.addToBackStack(null)
             fragmentTransaction.commit()
         }

@@ -1,18 +1,25 @@
 package com.example.snaplapse.timeline
 
+import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Base64
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.snaplapse.MainActivity
 import com.example.snaplapse.R
-import com.example.snaplapse.view_models.ItemsViewModel
+import com.example.snaplapse.api.RetrofitHelper
+import com.example.snaplapse.api.routes.PhotosApi
+import com.example.snaplapse.view_models.ItemsViewModel2
 
-class TimelineFragment : Fragment() {
+class TimelineFragment(val locationId: Int) : Fragment() {
+    private val photosApi = RetrofitHelper.getInstance().create(PhotosApi::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,26 +38,29 @@ class TimelineFragment : Fragment() {
         // this creates a vertical layout Manager
         recyclerview.layoutManager = LinearLayoutManager(MainActivity())
 
-        // ArrayList of class ItemsViewModel
-        val data = ArrayList<ItemsViewModel>()
-
-        // This loop will create 20 Views containing
-        // the image with the count of view
-        for (i in 0..19) {
-            var image: Int = if (i<10) {
-                R.drawable.statue_of_liberty
-            } else {
-                R.drawable.statue_of_liberty2
+        val data = mutableListOf<ItemsViewModel2>()
+        lifecycleScope.launchWhenCreated {
+            try {
+                val response = photosApi.getPhotosByLocation(locationId)
+                if (response.isSuccessful) {
+                    for (photo in response.body()!!.results) {
+                        if (!photo.bitmap.isEmpty()) {
+                            val decodedBitmap = Base64.decode(photo.bitmap, Base64.DEFAULT)
+                            val bitmap =
+                                BitmapFactory.decodeByteArray(decodedBitmap, 0, decodedBitmap.size)
+                            data.add(ItemsViewModel2(photo.id, photo.user, bitmap, photo.description))
+                        }
+                    }
+                    val adapter = CustomAdapter(data, parentFragmentManager)
+                    recyclerview.adapter = adapter
+                }
+                else {
+                    // TODO: Error handling
+                }
+            } catch (e: Exception) {
+                Log.e("GetPhotoError", e.toString())
             }
-            var card = ItemsViewModel(i, 1, image, (2022 - i).toString())
-            data.add(card)
         }
-
-        // This will pass the ArrayList to our Adapter
-        val adapter = CustomAdapter(data, parentFragmentManager)
-
-        // Setting the Adapter with the recyclerview
-        recyclerview.adapter = adapter
 
         backButton.setOnClickListener {
             parentFragmentManager.popBackStack()
