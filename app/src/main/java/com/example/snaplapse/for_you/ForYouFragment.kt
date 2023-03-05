@@ -3,6 +3,7 @@ package com.example.snaplapse.for_you
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.BitmapFactory
 import android.os.Bundle
@@ -23,6 +24,7 @@ import com.example.snaplapse.R
 import com.example.snaplapse.api.RetrofitHelper
 import com.example.snaplapse.api.routes.LocationsApi
 import com.example.snaplapse.api.routes.PhotosApi
+import com.example.snaplapse.databinding.FragmentForYouBinding
 import com.example.snaplapse.view_models.ForYouViewModel
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
@@ -31,33 +33,59 @@ import com.google.android.libraries.places.api.net.PlacesClient
 
 class ForYouFragment : Fragment() {
     private lateinit var safeContext: Context
+
+    private lateinit var adapter: ForYouAdapter
+    private lateinit var _binding: FragmentForYouBinding
+    private val binding get() = _binding
+
     private lateinit var placesClient: PlacesClient
     private var locationPermissionGranted = false
+    private var sharedPref: SharedPreferences? = null
 
     private val locationsApi = RetrofitHelper.getInstance().create(LocationsApi::class.java)
     private val photosApi = RetrofitHelper.getInstance().create(PhotosApi::class.java)
     private var userID: Int = 0
+    private var cards: ArrayList<ForYouViewModel> = ArrayList()
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         safeContext = context
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        userID = activity?.getSharedPreferences(getString(R.string.preferences_file_key), Context.MODE_PRIVATE)?.getInt("id", 0)!!
-    }
-
-    @SuppressLint("MissingPermission")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         getLocationPermission()
 
-        // Inflate the layout for this fragment
-        val view:View = inflater.inflate(R.layout.fragment_for_you, container, false)
+        _binding = FragmentForYouBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        sharedPref = activity?.getSharedPreferences(getString(R.string.preferences_file_key), Context.MODE_PRIVATE)
+
+        userID = sharedPref?.getInt("id", 0)!!
+        binding.rangeButton.setOnClickListener { RangeDialogFragment().show(childFragmentManager, "") }
+
+        handleRecommendations(view)
+    }
+
+    @SuppressLint("MissingPermission")
+    fun handleRecommendations (view: View) {
+        if (this::adapter.isInitialized) {
+            adapter.notifyItemRangeRemoved(0, cards.size)
+        }
+        cards.clear()
+
+        var range = if (sharedPref!!.contains("range")) {
+            sharedPref?.getInt("range", 0)!!
+        } else {
+            5000 // default radius 5km
+        }
         var currentCoordinates: String
+
         if (locationPermissionGranted) {
             Places.initialize(safeContext, BuildConfig.MAPS_API_KEY)
             placesClient = Places.createClient(safeContext)
@@ -73,30 +101,27 @@ class ForYouFragment : Fragment() {
                     val likelyPlace = task.result.placeLikelihoods[0].place
                     currentCoordinates = likelyPlace.latLng.latitude.toString() + "," + likelyPlace.latLng.longitude.toString()
 
-                    recommendations(view, currentCoordinates)
+                    recommendations(view, currentCoordinates, range)
                 }
             }
         } else {
             getLocationPermission()
         }
-
-        return view
     }
 
-    private fun recommendations(view: View, currentCoordinates: String) {
+    private fun recommendations(view: View, currentCoordinates: String, range: Int) {
         lifecycleScope.launchWhenCreated {
             try {
                 val recyclerView = view.findViewById<RecyclerView>(R.id.for_you_view)
                 recyclerView.layoutManager = LinearLayoutManager(MainActivity())
 
 //                val coordinates = "43.4723,-80.5449" // UWaterloo coordinates for testing
-                val recResponse = locationsApi.getRecommendations(userID, currentCoordinates, 5000.0, 10)
+                val recResponse = locationsApi.getRecommendations(userID, currentCoordinates, range, 20)
                 val recommendations = recResponse.body()?.results
 
-                val cards = ArrayList<ForYouViewModel>()
                 if (recommendations != null) {
                     for (location in recommendations) {
-                        val photosResponse = photosApi.getPhotosByLocation(location.id, "-created")
+                        val photosResponse = photosApi.getPhotosByLocation(location.id, "-created", 1)
                         val photos = photosResponse.body()?.results
                         if (photos?.isNotEmpty() == true) {
                             val mostRecentPhoto = photos[0]

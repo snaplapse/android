@@ -16,7 +16,7 @@ interface LocationsApi {
     @GET("/api/locations/recommendations")
     suspend fun getRecommendations(@Query("userId") userId: Int,
                                 @Query("coordinates", encoded = true) coordinates: String,
-                                @Query("radius") radius: Double,
+                                @Query("radius") radius: Int,
                                 @Query("count") count: Int): Response<LocationListResponse>
 
     @GET("/api/locations/googleId/{google_id}/")
