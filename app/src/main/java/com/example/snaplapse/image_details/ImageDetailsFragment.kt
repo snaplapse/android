@@ -54,13 +54,15 @@ class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<Ite
 
         likeButton = view.findViewById(R.id.like_button)
         likeButton!!.setOnClickListener {
-            likeImage(userID)
+            likePhoto(userID)
         }
+        getLike(userID)
 
         flagButton = view.findViewById(R.id.flag_button)
         flagButton!!.setOnClickListener {
             flagImage(userID)
         }
+        getFlag(userID)
 
         val backButton = view.findViewById<ImageButton>(R.id.image_details_back_button)
         backButton.setOnClickListener {
@@ -69,17 +71,61 @@ class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<Ite
         return view
     }
 
-    private fun likeImage(id: Int) {
+    private fun getLike(id: Int) {
         lifecycleScope.launchWhenCreated {
             try {
-                val requestBody = PhotoActionRequest(user=id, photo=item2?.id?:0)
-                val response = photosApi.like(requestBody)
-                if (response.isSuccessful) {
-                    likeButton?.setImageResource(R.drawable.ic_baseline_thumb_up_24_blue)
-                    Toast.makeText(activity, resources.getString(R.string.like_toast), Toast.LENGTH_SHORT).show()
+                val getLikeResponse = photosApi.getLike(user=id, photo=item2?.id?:0)
+                if (getLikeResponse.isSuccessful) {
+                    if (getLikeResponse.body()!!.results.isNotEmpty()) {
+                        likeButton?.setImageResource(R.drawable.ic_baseline_thumb_up_24_blue)
+                    }
                 }
-                else {
-                    Toast.makeText(activity, "Error Liking", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Log.e("getLikeError", e.toString())
+            }
+        }
+    }
+
+    private fun getFlag(id: Int) {
+        lifecycleScope.launchWhenCreated {
+            try {
+                val getFlagResponse = photosApi.getFlag(user=id, photo=item2?.id?:0)
+                if (getFlagResponse.isSuccessful) {
+                    if (getFlagResponse.body()!!.results.isNotEmpty()) {
+                        flagButton?.setImageResource(R.drawable.ic_baseline_flag_24_red)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("getFlagError", e.toString())
+            }
+        }
+    }
+
+    private fun likePhoto(id: Int) {
+        lifecycleScope.launchWhenCreated {
+            try {
+                val getLikeResponse = photosApi.getLike(user=id, photo=item2?.id?:0)
+                if (getLikeResponse.isSuccessful) {
+                    if (getLikeResponse.body()!!.results.isEmpty()) {
+                        val requestBody = PhotoActionRequest(user=id, photo=item2?.id?:0)
+                        val response = photosApi.like(requestBody)
+                        if (response.isSuccessful) {
+                            likeButton?.setImageResource(R.drawable.ic_baseline_thumb_up_24_blue)
+                            Toast.makeText(activity, resources.getString(R.string.like_toast), Toast.LENGTH_SHORT).show()
+                        }
+                        else {
+                            Toast.makeText(activity, "Error Liking", Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        val response = photosApi.unlike(id=getLikeResponse.body()!!.results[0].id)
+                        if (response.isSuccessful) {
+                            likeButton?.setImageResource(R.drawable.ic_baseline_thumb_up_24)
+                            Toast.makeText(activity, resources.getString(R.string.like_toast), Toast.LENGTH_SHORT).show()
+                        }
+                        else {
+                            Toast.makeText(activity, "Error Unliking", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
             } catch (e: Exception) {
                 Log.e("LikePhotoError", e.toString())
@@ -90,13 +136,28 @@ class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<Ite
     private fun flagImage(id: Int) {
         lifecycleScope.launchWhenCreated {
             try {
-                val requestBody = PhotoActionRequest(user=id, photo=item2?.id?:0)
-                val response = photosApi.flag(requestBody)
-                if (response.isSuccessful) {
-                    Toast.makeText(activity, resources.getString(R.string.flag_toast), Toast.LENGTH_SHORT).show()
-                }
-                else {
-                    Toast.makeText(activity, "Error Flagging", Toast.LENGTH_SHORT).show()
+                val getFlagResponse = photosApi.getFlag(user=id, photo=item2?.id?:0)
+                if (getFlagResponse.isSuccessful) {
+                    if (getFlagResponse.body()!!.results.isEmpty()) {
+                        val requestBody = PhotoActionRequest(user=id, photo=item2?.id?:0)
+                        val response = photosApi.flag(requestBody)
+                        if (response.isSuccessful) {
+                            flagButton?.setImageResource(R.drawable.ic_baseline_flag_24_red)
+                            Toast.makeText(activity, resources.getString(R.string.flag_toast), Toast.LENGTH_SHORT).show()
+                        }
+                        else {
+                            Toast.makeText(activity, "Error Flagging", Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        val response = photosApi.unflag(id=getFlagResponse.body()!!.results[0].id)
+                        if (response.isSuccessful) {
+                            flagButton?.setImageResource(R.drawable.ic_baseline_flag_24)
+                            Toast.makeText(activity, resources.getString(R.string.flag_toast), Toast.LENGTH_SHORT).show()
+                        }
+                        else {
+                            Toast.makeText(activity, "Error Unflagging", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 }
             } catch (e: Exception) {
                 Log.e("FlagPhotoError", e.toString())
