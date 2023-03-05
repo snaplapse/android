@@ -86,6 +86,7 @@ class CameraFragment : Fragment() {
             requestMultiplePermissions.launch(REQUIRED_PERMISSIONS)
         }
         sharedPref = activity?.getSharedPreferences(getString(R.string.preferences_file_key), Context.MODE_PRIVATE)
+        binding.spoofButton.visibility = View.VISIBLE
         binding.spoofButton.setOnClickListener { SpoofDialogFragment().show(childFragmentManager, "")}
         binding.shutterButton.setOnClickListener { takePhoto() }
         cameraExecutor = Executors.newSingleThreadExecutor()
@@ -114,7 +115,6 @@ class CameraFragment : Fragment() {
         }, ContextCompat.getMainExecutor(safeContext))
     }
 
-    @SuppressLint("MissingPermission")
     private fun takePhoto() {
         val imageCapture = imageCapture ?: return
         imageCapture.takePicture(ContextCompat.getMainExecutor(safeContext), object : ImageCapture.OnImageCapturedCallback() {
@@ -135,7 +135,7 @@ class CameraFragment : Fragment() {
                 )
                 viewModel.setImageBitmap(imageBitmap)
 
-                if (sharedPref!!.contains("latitude") && sharedPref!!.contains("longitude")) {
+                if (sharedPref!!.contains("latitude") && sharedPref!!.contains("longitude") && binding.spoofButton.visibility != View.GONE) {
                     lifecycleScope.launchWhenCreated {
                         try {
                             val sb = StringBuilder()
@@ -182,44 +182,49 @@ class CameraFragment : Fragment() {
                     }
                 }
                 else {
-                    if (locationPermissionGranted) {
-                        Places.initialize(safeContext, BuildConfig.MAPS_API_KEY)
-                        placesClient = Places.createClient(safeContext)
-
-                        // Use fields to define the data types to return.
-                        val placeFields = listOf(Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG, Place.Field.TYPES, Place.Field.ID)
-
-                        // Use the builder to create a FindCurrentPlaceRequest.
-                        val request = FindCurrentPlaceRequest.newInstance(placeFields)
-
-                        // Get the likely places - that is, the businesses and other points of interest that
-                        // are the best match for the device's current location.
-
-                        val placeResult = placesClient.findCurrentPlace(request)
-                        placeResult.addOnCompleteListener { task ->
-                            if (task.isSuccessful && task.result != null) {
-                                val likelyPlace = task.result.placeLikelihoods[0].place
-
-                                val types = ArrayList<String>()
-                                for (i in likelyPlace.types) {
-                                    types.add(i.toString())
-                                }
-
-                                val transaction = parentFragmentManager.beginTransaction()
-                                transaction.add(R.id.fragmentContainerView,
-                                    PhotoEditFragment(CurrentPlaceViewModel(likelyPlace.name, likelyPlace.address, likelyPlace.id, likelyPlace.latLng.latitude, likelyPlace.latLng.longitude, types))
-                                )
-                                transaction.commit()
-                                image.close()
-                            }
-                        }
-                    } else {
-                        getLocationPermission()
-                    }
+                    useCurrentPlace(image)
                 }
             }
             override fun onError(exception: ImageCaptureException) {}
         })
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun useCurrentPlace(image: ImageProxy) {
+        if (locationPermissionGranted) {
+            Places.initialize(safeContext, BuildConfig.MAPS_API_KEY)
+            placesClient = Places.createClient(safeContext)
+
+            // Use fields to define the data types to return.
+            val placeFields = listOf(Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG, Place.Field.TYPES, Place.Field.ID)
+
+            // Use the builder to create a FindCurrentPlaceRequest.
+            val request = FindCurrentPlaceRequest.newInstance(placeFields)
+
+            // Get the likely places - that is, the businesses and other points of interest that
+            // are the best match for the device's current location.
+
+            val placeResult = placesClient.findCurrentPlace(request)
+            placeResult.addOnCompleteListener { task ->
+                if (task.isSuccessful && task.result != null) {
+                    val likelyPlace = task.result.placeLikelihoods[0].place
+
+                    val types = ArrayList<String>()
+                    for (i in likelyPlace.types) {
+                        types.add(i.toString())
+                    }
+
+                    val transaction = parentFragmentManager.beginTransaction()
+                    transaction.add(R.id.fragmentContainerView,
+                        PhotoEditFragment(CurrentPlaceViewModel(likelyPlace.name, likelyPlace.address, likelyPlace.id, likelyPlace.latLng.latitude, likelyPlace.latLng.longitude, types))
+                    )
+                    transaction.commit()
+                    image.close()
+                }
+            }
+        } else {
+            getLocationPermission()
+        }
     }
 
     private fun getLocationPermission() {
