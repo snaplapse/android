@@ -27,30 +27,20 @@ class ForYouAdapter(private val mList: List<ForYouViewModel>, private val fragme
 
     // binds the list items to a view
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+
         val forYouViewModel = mList[position]
-        val imageView = ImageView(holder.linearLayout.context)
-        imageView.setImageBitmap(forYouViewModel.thumbnail)
-        imageView.setOnClickListener{
+
+        // sets the image to the imageview from our itemHolder class
+        holder.imageView.setImageBitmap(forYouViewModel.thumbnail)
+        holder.imageView.setOnClickListener{
             val timelineFragment = TimelineFragment(forYouViewModel.locationId)
             val fragmentTransaction = fragmentManager.beginTransaction()
             fragmentTransaction.replace(R.id.fragmentContainerView, timelineFragment)
             fragmentTransaction.addToBackStack(null)
             fragmentTransaction.commit()
         }
-        imageView.scaleType = ImageView.ScaleType.CENTER_INSIDE
-        imageView.adjustViewBounds = true
-        val params = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.WRAP_CONTENT,
-            LinearLayout.LayoutParams.MATCH_PARENT
-        ).apply {
-            weight = 1.0f
-            gravity = Gravity.LEFT
-        }
-        params.height = 1000
-        imageView.layoutParams = params
 
-        holder.linearLayout.addView(imageView)
-
+        // sets the text to the textview from our itemHolder class
         holder.textView.text = forYouViewModel.name
     }
 
@@ -61,7 +51,7 @@ class ForYouAdapter(private val mList: List<ForYouViewModel>, private val fragme
 
     // Holds the views for adding it to image and text
     class ViewHolder(ItemView: View) : RecyclerView.ViewHolder(ItemView) {
-        val linearLayout: LinearLayout = itemView.findViewById(R.id.timelines_row)
-        val textView: TextView = itemView.findViewById(R.id.tag_label)
+        val imageView: ImageView = itemView.findViewById(R.id.forYouImageView)
+        val textView: TextView = itemView.findViewById(R.id.forYouItem)
     }
 }
