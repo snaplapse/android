@@ -25,7 +25,7 @@ class ProfileRecyclerViewAdapter(private val data: List<ItemsViewModel2>) : Recy
             val transaction = (holder.itemView.context as FragmentActivity).supportFragmentManager.beginTransaction()
             transaction.replace(
                 R.id.fragmentContainerView,
-                ImageDetailsFragment(ItemsViewModel(position, 1, 0, ""), listOf(), ItemsViewModel2(photo.id, photo.user, photo.image, photo.text))
+                ImageDetailsFragment(ItemsViewModel(position, 1, 0, ""), listOf(), photo)
             )
             transaction.addToBackStack(null)
             transaction.commit()

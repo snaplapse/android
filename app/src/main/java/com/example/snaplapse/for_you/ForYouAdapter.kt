@@ -34,12 +34,6 @@ class ForYouAdapter(private val mList: List<ForYouViewModel>, private val fragme
             val timelineFragment = TimelineFragment(forYouViewModel.locationId)
             val fragmentTransaction = fragmentManager.beginTransaction()
             fragmentTransaction.replace(R.id.fragmentContainerView, timelineFragment)
-
-//            val transaction = (holder.itemView.context as FragmentActivity).supportFragmentManager.beginTransaction()
-//            transaction.replace(
-//                R.id.fragmentContainerView,
-//                TimelineFragment(forYouViewModel.locationId)
-//            )
             fragmentTransaction.addToBackStack(null)
             fragmentTransaction.commit()
         }

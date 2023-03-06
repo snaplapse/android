@@ -15,7 +15,10 @@ import androidx.lifecycle.lifecycleScope
 import com.example.snaplapse.R
 import com.example.snaplapse.api.RetrofitHelper
 import com.example.snaplapse.api.data.photo.PhotoActionRequest
+import com.example.snaplapse.api.routes.LocationsApi
 import com.example.snaplapse.api.routes.PhotosApi
+import com.example.snaplapse.api.routes.UsersApi
+import com.example.snaplapse.timeline.TimelineFragment
 import com.example.snaplapse.view_models.ItemsViewModel
 import com.example.snaplapse.view_models.ItemsViewModel2
 
@@ -24,6 +27,8 @@ class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<Ite
     private var likeButton: ImageButton? = null
     private var flagButton: ImageButton? = null
 
+    private val usersApi = RetrofitHelper.getInstance().create(UsersApi::class.java)
+    private val locationsApi = RetrofitHelper.getInstance().create(LocationsApi::class.java)
     private val photosApi = RetrofitHelper.getInstance().create(PhotosApi::class.java)
 
     private var userID: Int = 0
@@ -40,21 +45,64 @@ class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<Ite
         val view = inflater.inflate(R.layout.fragment_image_details, container, false)
         val text = view.findViewById<TextView>(R.id.textView)
         val img: ImageView = view.findViewById(R.id.imageView) as ImageView
+        val userName = view.findViewById<TextView>(R.id.userName)
+        val location = view.findViewById<TextView>(R.id.location)
+        val date = view.findViewById<TextView>(R.id.date)
+        val likeCount = view.findViewById<TextView>(R.id.likeCount)
+
+        val photoId: Int
+        val description: String
 
         userID = activity?.getSharedPreferences(getString(R.string.preferences_file_key), Context.MODE_PRIVATE)?.getInt("id", 0)!!
 
         if (item2 == null) {
-            text.text = resources.getString(R.string.image_details).format(item.text)
+            photoId = item.id
+            description = item.text
             img.setImageResource(item.image)
             img.setOnTouchListener(OnSwipeTouchListener(activity, item, mList, view))
         } else {
-            text.text = resources.getString(R.string.image_details).format(item2.text)
+            photoId = item2.id
+            description = item2.text
             img.setImageBitmap(item2.image)
+        }
+        text.text = description
+        date.text = item2!!.date
+
+        lifecycleScope.launchWhenCreated {
+            try {
+                val userResponse = usersApi.getUser(userID)
+                if (userResponse.isSuccessful) {
+                    userName.text = userResponse.body()!!.username
+                }
+
+                val photoResponse = photosApi.getPhoto(photoId)
+                if (photoResponse.isSuccessful) {
+                    val locationId = photoResponse.body()!!.location
+                    val locationResponse = locationsApi.getLocation(locationId)
+                    if (locationResponse.isSuccessful) {
+                        location.text = locationResponse.body()!!.name
+                        location.setOnClickListener {
+                            val timelineFragment = TimelineFragment(locationId)
+                            val fragmentTransaction = parentFragmentManager.beginTransaction()
+                            fragmentTransaction.replace(R.id.fragmentContainerView, timelineFragment)
+                            fragmentTransaction.addToBackStack(null)
+                            fragmentTransaction.commit()
+                        }
+                    }
+                }
+
+                val likeResponse = photosApi.getLike(null, photoId)
+                if (likeResponse.isSuccessful) {
+                    likeCount.text = likeResponse.body()!!.results.size.toString()
+                }
+            } catch (e: Exception) {
+                Log.e("GetPhotoError", e.toString())
+            }
         }
 
         likeButton = view.findViewById(R.id.like_button)
         likeButton!!.setOnClickListener {
-            likePhoto(userID)
+            likePhoto(userID, likeCount)
         }
         getLike(userID)
 
@@ -101,7 +149,7 @@ class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<Ite
         }
     }
 
-    private fun likePhoto(id: Int) {
+    private fun likePhoto(id: Int, likeCount: TextView) {
         lifecycleScope.launchWhenCreated {
             try {
                 val getLikeResponse = photosApi.getLike(user=id, photo=item2?.id?:0)
@@ -111,7 +159,7 @@ class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<Ite
                         val response = photosApi.like(requestBody)
                         if (response.isSuccessful) {
                             likeButton?.setImageResource(R.drawable.ic_baseline_thumb_up_24_blue)
-                            Toast.makeText(activity, resources.getString(R.string.like_toast), Toast.LENGTH_SHORT).show()
+                            likeCount.text = (likeCount.text.toString().toInt() + 1).toString()
                         }
                         else {
                             Toast.makeText(activity, "Error Liking", Toast.LENGTH_SHORT).show()
@@ -120,7 +168,7 @@ class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<Ite
                         val response = photosApi.unlike(id=getLikeResponse.body()!!.results[0].id)
                         if (response.isSuccessful) {
                             likeButton?.setImageResource(R.drawable.ic_baseline_thumb_up_24)
-                            Toast.makeText(activity, resources.getString(R.string.like_toast), Toast.LENGTH_SHORT).show()
+                            likeCount.text = (likeCount.text.toString().toInt() - 1).toString()
                         }
                         else {
                             Toast.makeText(activity, "Error Unliking", Toast.LENGTH_SHORT).show()
