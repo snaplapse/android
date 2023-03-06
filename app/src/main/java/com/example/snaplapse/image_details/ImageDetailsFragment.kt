@@ -88,13 +88,6 @@ class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<Ite
                             fragmentTransaction.addToBackStack(null)
                             fragmentTransaction.commit()
                         }
-                        date.setOnClickListener {
-                            val timelineFragment = TimelineFragment(locationId)
-                            val fragmentTransaction = parentFragmentManager.beginTransaction()
-                            fragmentTransaction.replace(R.id.fragmentContainerView, timelineFragment)
-                            fragmentTransaction.addToBackStack(null)
-                            fragmentTransaction.commit()
-                        }
                     }
                 }
 
