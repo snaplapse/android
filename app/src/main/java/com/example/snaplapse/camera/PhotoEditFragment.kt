@@ -1,11 +1,8 @@
 package com.example.snaplapse.camera
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.location.Location
 import android.os.Bundle
 import android.util.Base64
 import android.util.Log
@@ -15,24 +12,18 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import com.example.snaplapse.BuildConfig
 import com.example.snaplapse.R
-import com.example.snaplapse.api.MapHelper
 import com.example.snaplapse.api.RetrofitHelper
 import com.example.snaplapse.api.data.category.CategoryRequest
 import com.example.snaplapse.api.data.location.LocationRequest
 import com.example.snaplapse.api.data.photo.PhotoRequest
 import com.example.snaplapse.api.routes.CategoriesApi
 import com.example.snaplapse.api.routes.LocationsApi
-import com.example.snaplapse.api.routes.MapsApi
 import com.example.snaplapse.api.routes.PhotosApi
 import com.example.snaplapse.databinding.FragmentPhotoEditBinding
-import com.example.snaplapse.map.MapFragment
 import com.example.snaplapse.view_models.CameraViewModel
 import com.example.snaplapse.view_models.CurrentPlaceViewModel
 import com.example.snaplapse.view_models.ItemsViewModel2
@@ -55,6 +46,8 @@ class PhotoEditFragment(var currentPlaceViewModel: CurrentPlaceViewModel) : Frag
     private val photosApi = RetrofitHelper.getInstance().create(PhotosApi::class.java)
     private val categoriesApi = RetrofitHelper.getInstance().create(CategoriesApi::class.java)
     private val locationsApi = RetrofitHelper.getInstance().create(LocationsApi::class.java)
+
+    private var description = ""
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -85,12 +78,29 @@ class PhotoEditFragment(var currentPlaceViewModel: CurrentPlaceViewModel) : Frag
             this.imageBitmap = imageBitmap
             binding.imageView.setImageBitmap(imageBitmap)
         }
+        binding.locationButton.setOnClickListener { openSetLocationDialog() }
+        binding.descriptionButton.setOnClickListener { openSetDescriptionDialog() }
         binding.uploadButton.setOnClickListener { uploadPhoto() }
         binding.deleteButton.setOnClickListener { deletePhoto() }
+
+        childFragmentManager.setFragmentResultListener("descriptionDialog", viewLifecycleOwner) { key, bundle ->
+            description = bundle.getString("descriptionKey").toString()
+        }
+    }
+
+    private fun openSetLocationDialog() {
+        val locationDialogFragment = LocationDialogFragment()
+        locationDialogFragment.setLocation(currentPlaceViewModel.name)
+        locationDialogFragment.show(childFragmentManager, "")
+    }
+
+    private fun openSetDescriptionDialog() {
+        val descriptionDialogFragment = DescriptionDialogFragment()
+        descriptionDialogFragment.setDesc(description)
+        descriptionDialogFragment.show(childFragmentManager, "")
     }
 
     private fun uploadPhoto() {
-        val description = binding.textInput.text.toString()
         if (description.isBlank()) {
             Toast.makeText(safeContext, "Please provide a description.", Toast.LENGTH_SHORT).show()
         } else {
@@ -157,11 +167,11 @@ class PhotoEditFragment(var currentPlaceViewModel: CurrentPlaceViewModel) : Frag
                 if (response.isSuccessful) {
                     Toast.makeText(
                         safeContext,
-                        "Uploaded photo: " + binding.textInput.text.toString(),
+                        "Uploaded photo: " + description,
                         Toast.LENGTH_SHORT
                     ).show()
                     val current = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                    val text = current.toString() + "\n" + binding.textInput.text.toString()
+                    val text = current.toString() + "\n" + description
                     val parseFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd")
                     val printFormat = DateTimeFormatter.ofPattern("MMMM dd, yyyy")
                     val date = LocalDate.parse(response.body()!!.created.substring(0, 10), parseFormat)

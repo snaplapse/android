@@ -123,15 +123,11 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
 
     /** Called when the user clicks a marker.  */
     override fun onMarkerClick(marker: Marker): Boolean {
-
-        // need to add another page to view all the posts at the clicked location
-        Toast.makeText(safeContext, "test", Toast.LENGTH_SHORT).show()
+        val locationId = marker.tag as Int
         val transaction = parentFragmentManager.beginTransaction()
-        transaction.replace(R.id.fragmentContainerView, TimelineFragment(0))
+        transaction.replace(R.id.fragmentContainerView, TimelineFragment(locationId))
         transaction.addToBackStack(null)
         transaction.commit()
-
-
 
         // Return false to indicate that we have not consumed the event and that we wish
         // for the default behavior to occur
@@ -265,7 +261,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
                                 .position(marker1)
                                 .title(location.name) // this is just temporary until we put actual data in
                         )
-                        //place?.tag = "location_id" //use the location id here to reference the location when clicked
+                        place?.tag = location.id //use the location id here to reference the location when clicked
                     }
                 }
             }catch (e: Exception) {
