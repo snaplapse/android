@@ -99,17 +99,6 @@
         tools:layout_editor_absoluteX="0dp">
 
         <Button
-            android:id="@+id/change_avatar_button"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@android:color/transparent"
-            android:text="@string/change_avatar_button"
-            android:textColor="@color/black"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Button
             android:id="@+id/edit_username_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -118,7 +107,7 @@
             android:textColor="@color/black"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/change_avatar_button"
+            app:layout_constraintTop_toTopOf="parent"
             app:strokeColor="@color/black"
             app:strokeWidth="3dp" />
 

@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
         bottomNavigationView.setupWithNavController(navController)
         bottomNavigationView.setOnItemSelectedListener {
             navController.navigate(it.itemId, bundle)
-            true
+            false
         }
     }
 }

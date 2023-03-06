@@ -32,6 +32,7 @@ import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest
 import com.google.android.libraries.places.api.net.PlacesClient
 
 class ForYouFragment : Fragment() {
+    private var fragment = this
     private lateinit var safeContext: Context
 
     private lateinit var adapter: ForYouAdapter
@@ -136,7 +137,7 @@ class ForYouFragment : Fragment() {
                     }
                 }
 
-                val adapter = ForYouAdapter(cards, parentFragmentManager)
+                val adapter = ForYouAdapter(cards, parentFragmentManager, fragment)
                 recyclerView.adapter = adapter
 
             } catch (e: Exception) {

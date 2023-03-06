@@ -127,7 +127,8 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
     override fun onMarkerClick(marker: Marker): Boolean {
         val locationId = marker.tag as Int
         val transaction = parentFragmentManager.beginTransaction()
-        transaction.replace(R.id.fragmentContainerView, TimelineFragment(locationId))
+        transaction.hide(this)
+        transaction.add(R.id.fragmentContainerView, TimelineFragment(locationId))
         transaction.addToBackStack(null)
         transaction.commit()
 

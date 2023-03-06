@@ -14,6 +14,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.example.snaplapse.R
+import com.example.snaplapse.timeline.TimelineFragment
 import java.time.format.DateTimeFormatter
 
 class SettingsFragment : Fragment() {
@@ -37,11 +38,6 @@ class SettingsFragment : Fragment() {
 
         val joinedView: TextView = view.findViewById(R.id.date_joined_text)
         joinedView.text = sharedPref?.getString("joined", "")
-
-        val changeAvatarButton: Button = view.findViewById(R.id.change_avatar_button)
-        changeAvatarButton.setOnClickListener {
-            isPhotoPickerAvailable()
-        }
 
         val editUsernameButton: Button = view.findViewById(R.id.edit_username_button)
         editUsernameButton.setOnClickListener {
@@ -78,7 +74,8 @@ class SettingsFragment : Fragment() {
 
     private fun changeFragment(fragment: Fragment) {
         val transaction = parentFragmentManager.beginTransaction()
-        transaction.replace(R.id.fragmentContainerView, fragment)
+        transaction.hide(this)
+        transaction.add(R.id.fragmentContainerView, fragment)
         transaction.addToBackStack(null)
         transaction.commit()
     }

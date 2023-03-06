@@ -1,6 +1,7 @@
 package com.example.snaplapse.image_details
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -49,6 +50,7 @@ class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<Ite
         val location = view.findViewById<TextView>(R.id.location)
         val date = view.findViewById<TextView>(R.id.date)
         val likeCount = view.findViewById<TextView>(R.id.likeCount)
+        val fragment = this
 
         val photoId: Int
         val description: String
@@ -83,10 +85,11 @@ class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<Ite
                         location.text = locationResponse.body()!!.name
                         location.setOnClickListener {
                             val timelineFragment = TimelineFragment(locationId)
-                            val fragmentTransaction = parentFragmentManager.beginTransaction()
-                            fragmentTransaction.replace(R.id.fragmentContainerView, timelineFragment)
-                            fragmentTransaction.addToBackStack(null)
-                            fragmentTransaction.commit()
+                            val transaction = parentFragmentManager.beginTransaction()
+                            transaction.hide(fragment)
+                            transaction.add(R.id.fragmentContainerView, timelineFragment)
+                            transaction.addToBackStack(null)
+                            transaction.commit()
                         }
                     }
                 }
