@@ -157,42 +157,13 @@ class CameraFragment : Fragment() {
                 )
                 viewModel.setImageBitmap(imageBitmap)
 
-                var coordsString = ""
-
                 if (binding.spoofButton.visibility != View.GONE && spoof) {
                     val sb = StringBuilder()
                     sb.append(latitude).append(",").append(longitude)
-                    coordsString = sb.toString()
-                    callNearbySearch(coordsString, image)
+                    callNearbySearch(sb.toString(), image)
                 }
                 else {
-                    if (locationPermissionGranted) {
-                        Places.initialize(safeContext, BuildConfig.MAPS_API_KEY)
-                        placesClient = Places.createClient(safeContext)
-
-                        // Use fields to define the data types to return.
-                        val placeFields = listOf(Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG, Place.Field.TYPES, Place.Field.ID)
-
-                        // Use the builder to create a FindCurrentPlaceRequest.
-                        val request = FindCurrentPlaceRequest.newInstance(placeFields)
-
-                        // Get the likely places - that is, the businesses and other points of interest that
-                        // are the best match for the device's current location.
-
-                        val placeResult = placesClient.findCurrentPlace(request)
-                        placeResult.addOnCompleteListener { task ->
-                            if (task.isSuccessful && task.result != null) {
-                                val likelyPlace = task.result.placeLikelihoods[0].place
-                                val sb = StringBuilder()
-                                sb.append(likelyPlace.latLng.latitude).append(",").append(likelyPlace.latLng.longitude)
-                                coordsString = sb.toString()
-                                callNearbySearch(coordsString, image)
-                            }
-                        }
-                    }
-                    else {
-                        getLocationPermission()
-                    }
+                    useCurrentPlace(image)
                 }
             }
             override fun onError(exception: ImageCaptureException) {}
@@ -250,7 +221,7 @@ class CameraFragment : Fragment() {
         }
     }
 
-    /*@SuppressLint("MissingPermission")
+    @SuppressLint("MissingPermission")
     private fun useCurrentPlace(image: ImageProxy) {
         if (locationPermissionGranted) {
             Places.initialize(safeContext, BuildConfig.MAPS_API_KEY)
@@ -268,54 +239,40 @@ class CameraFragment : Fragment() {
             val placeResult = placesClient.findCurrentPlace(request)
             placeResult.addOnCompleteListener { task ->
                 if (task.isSuccessful && task.result != null) {
-                    val likelyPlace = task.result.placeLikelihoods[0].place
+                    val likelyPlaces = task.result.placeLikelihoods
 
-                    val params = HashMap<String, String>()
-                    params["key"] = BuildConfig.MAPS_API_KEY
-                    params["fields"] = "formatted_address,name,place_id,types,geometry"
-                    params["inputtype"] = "textquery"
-                    params["input"] = likelyPlace.address
+                    val viewModels = ArrayList<CurrentPlaceViewModel>()
 
-                    lifecycleScope.launchWhenCreated {
-                        try {
-                            val response = mapsApi.findPlaceFromText(params)
-
-                            if (response.isSuccessful) {
-                                val json = JSONObject(response.body().toString())
-                                val likelyPlace = JSONObject(json.getJSONArray("candidates")[0].toString())
-
-                                val types = ArrayList<String>()
-                                for (i in 0 until likelyPlace.getJSONArray("types").length()) {
-                                    types.add(likelyPlace.getJSONArray("types")[i].toString())
-                                }
-
-//                                val transaction = parentFragmentManager.beginTransaction()
-//                                transaction.add(R.id.fragmentContainerView,
-//                                    PhotoEditFragment(CurrentPlaceViewModel
-//                                        (
-//                                            likelyPlace.getString("name"),
-//                                            likelyPlace.getString("formatted_address"),
-//                                            likelyPlace.getString("place_id"),
-//                                            likelyPlace.getJSONObject("geometry").getJSONObject("location").getDouble("lat"),
-//                                            likelyPlace.getJSONObject("geometry").getJSONObject("location").getDouble("lng"),
-//                                            types
-//                                        )
-//                                    )
-//                                )
-//                                transaction.commit()
-//                                image.close()
-
-                            }
-                        } catch (e: Exception) {
-                            Log.i("FindPlaceError", e.toString())
+                    for (i in likelyPlaces) {
+                        val types = ArrayList<String>()
+                        for (j in i.place.types!!) {
+                            types.add(j.toString())
                         }
+
+                        viewModels.add(CurrentPlaceViewModel
+                            (
+                                i.place.name,
+                                i.place.address,
+                                i.place.id,
+                                i.place.latLng.latitude,
+                                i.place.latLng.longitude,
+                                types
+                            )
+                        )
                     }
+
+                    val transaction = parentFragmentManager.beginTransaction()
+                    transaction.add(R.id.fragmentContainerView,
+                        PhotoEditFragment(viewModels)
+                    )
+                    transaction.commit()
+                    image.close()
                 }
             }
         } else {
             getLocationPermission()
         }
-    }*/
+    }
 
     private fun getLocationPermission() {
         /*
