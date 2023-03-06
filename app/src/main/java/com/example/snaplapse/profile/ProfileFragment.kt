@@ -52,7 +52,7 @@ class ProfileFragment : Fragment() {
         val data = mutableListOf<ItemsViewModel2>()
         lifecycleScope.launchWhenCreated {
             try {
-                val response = photosApi.getPhotosByUser(userId)
+                val response = photosApi.getPhotosByUser(userId, "-created")
                 if (response.isSuccessful) {
                     for (photo in response.body()!!.results) {
                         if (!photo.bitmap.isEmpty()) {
