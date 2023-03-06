@@ -17,7 +17,7 @@ import com.example.snaplapse.R
 import com.example.snaplapse.timeline.TimelineFragment
 import java.time.format.DateTimeFormatter
 
-class SettingsFragment : Fragment() {
+class SettingsFragment(private val profileUsernameView: TextView) : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,7 +41,7 @@ class SettingsFragment : Fragment() {
 
         val editUsernameButton: Button = view.findViewById(R.id.edit_username_button)
         editUsernameButton.setOnClickListener {
-            changeFragment(EditUsernameFragment())
+            changeFragment(EditUsernameFragment(usernameView, profileUsernameView))
         }
 
         val changePasswordButton: Button = view.findViewById(R.id.change_password_button)

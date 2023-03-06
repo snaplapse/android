@@ -25,7 +25,6 @@ import java.time.format.DateTimeFormatter
 
 
 class ProfileFragment : Fragment() {
-    private val viewModel: CameraViewModel by activityViewModels()
     private var usernameText: String? = null
     private var userId: Int = 0
     private val fragment = this
@@ -49,6 +48,8 @@ class ProfileFragment : Fragment() {
         val recyclerview = view.findViewById<RecyclerView>(R.id.profile_recycler_view)
         recyclerview.layoutManager = GridLayoutManager(MainActivity(), 3)
 
+        val usernameView = view.findViewById<TextView>(R.id.profile_username)
+
         val data = mutableListOf<ItemsViewModel2>()
         lifecycleScope.launchWhenCreated {
             try {
@@ -65,8 +66,7 @@ class ProfileFragment : Fragment() {
                             data.add(ItemsViewModel2(photo.id, userId, bitmap, photo.description, date.format(printFormat).toString(), photo.visible))
                         }
                     }
-                    val username = view.findViewById<TextView>(R.id.profile_username)
-                    username.text = usernameText
+                    usernameView.text = usernameText
                     val adapter = ProfileRecyclerViewAdapter(data, parentFragmentManager, fragment)
                     recyclerview.adapter = adapter
                 }
@@ -82,7 +82,7 @@ class ProfileFragment : Fragment() {
         settingsButton.setOnClickListener {
             val transaction = parentFragmentManager.beginTransaction()
             transaction.hide(this)
-            transaction.add(R.id.fragmentContainerView, SettingsFragment())
+            transaction.add(R.id.fragmentContainerView, SettingsFragment(usernameView))
             transaction.addToBackStack(null)
             transaction.commit()
         }
