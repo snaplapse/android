@@ -6,7 +6,5 @@ data class ItemsViewModel2(
     val id: Int,
     val user: Int,
     val image: Bitmap,
-    val text: String
-    ) {
-
-}
+    val text: String,
+    )

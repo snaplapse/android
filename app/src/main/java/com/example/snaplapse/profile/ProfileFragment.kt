@@ -17,6 +17,7 @@ import com.example.snaplapse.MainActivity
 import com.example.snaplapse.R
 import com.example.snaplapse.api.RetrofitHelper
 import com.example.snaplapse.api.routes.PhotosApi
+import com.example.snaplapse.api.routes.UsersApi
 import com.example.snaplapse.settings.SettingsFragment
 import com.example.snaplapse.view_models.CameraViewModel
 import com.example.snaplapse.view_models.ItemsViewModel2

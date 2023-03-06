@@ -7,6 +7,9 @@ import retrofit2.Response
 import retrofit2.http.*
 
 interface UsersApi {
+    @GET("/api/users/{id}/")
+    suspend fun getUser(@Path("id") id: Int): Response<User>
+
     @POST("/api/login/")
     suspend fun login(@Body user: UserCredentialsRequest): Response<GenericResult>
 

@@ -29,8 +29,8 @@ interface PhotosApi {
 
     @GET("/api/likes/")
     suspend fun getLike(
-        @Query("user") user: Int,
-        @Query("photo") photo: Int,
+        @Query("user") user: Int?,
+        @Query("photo") photo: Int?,
     ): Response<PhotoActionListResponse>
 
     @GET("/api/flags/")
