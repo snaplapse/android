@@ -50,22 +50,30 @@ class TimelineFragment(val locationId: Int) : Fragment() {
         val fragment = this
         lifecycleScope.launchWhenCreated {
             try {
-                val response = photosApi.getPhotosByLocation(locationId, "-created")
-                if (response.isSuccessful) {
-                    for (photo in response.body()!!.results) {
-                        if (!photo.bitmap.isEmpty()) {
-                            val decodedBitmap = Base64.decode(photo.bitmap, Base64.DEFAULT)
-                            val bitmap =
-                                BitmapFactory.decodeByteArray(decodedBitmap, 0, decodedBitmap.size)
-                            val parseFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-                            val printFormat = DateTimeFormatter.ofPattern("MMMM dd, yyyy")
-                            val date = LocalDate.parse(photo.created.substring(0, 10), parseFormat)
-                            data.add(ItemsViewModel2(photo.id, photo.user, bitmap, photo.description, date.format(printFormat).toString(), photo.visible))
+                var page = 1
+
+                while (true) {
+                    val response = photosApi.getPhotosByLocation(locationId, "-created", null, page)
+                    if (response.isSuccessful) {
+                        for (photo in response.body()!!.results) {
+                            if (!photo.bitmap.isEmpty()) {
+                                val decodedBitmap = Base64.decode(photo.bitmap, Base64.DEFAULT)
+                                val bitmap =
+                                    BitmapFactory.decodeByteArray(decodedBitmap, 0, decodedBitmap.size)
+                                val parseFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                                val printFormat = DateTimeFormatter.ofPattern("MMMM dd, yyyy")
+                                val date = LocalDate.parse(photo.created.substring(0, 10), parseFormat)
+                                data.add(ItemsViewModel2(photo.id, photo.user, bitmap, photo.description, date.format(printFormat).toString(), photo.visible))
+                            }
                         }
+                    } else {
+                        break
                     }
                     val adapter = CustomAdapter(data, parentFragmentManager, fragment)
                     recyclerview.adapter = adapter
+                    page += 1
                 }
+
                 val locationResponse = locationsApi.getLocation(locationId)
                 if (locationResponse.isSuccessful) {
                     locationName.text = locationResponse.body()!!.name
