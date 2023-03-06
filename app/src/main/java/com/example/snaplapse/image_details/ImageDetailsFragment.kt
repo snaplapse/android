@@ -80,13 +80,13 @@ class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<Ite
 
         lifecycleScope.launchWhenCreated {
             try {
-                val userResponse = usersApi.getUser(userID)
-                if (userResponse.isSuccessful) {
-                    userName.text = userResponse.body()!!.username
-                }
-
                 val photoResponse = photosApi.getPhoto(photoId)
                 if (photoResponse.isSuccessful) {
+                    val userId = photoResponse.body()!!.user
+                    val userResponse = usersApi.getUser(userId)
+                    if (userResponse.isSuccessful) {
+                        userName.text = userResponse.body()!!.username
+                    }
                     val locationId = photoResponse.body()!!.location
                     val locationResponse = locationsApi.getLocation(locationId)
                     if (locationResponse.isSuccessful) {
