@@ -17,7 +17,7 @@ import com.example.snaplapse.api.RetrofitHelper
 import com.example.snaplapse.api.routes.UsersApi
 import com.example.snaplapse.api.data.user.UserCredentialsRequest
 
-class EditUsernameFragment : Fragment() {
+class EditUsernameFragment(private val usernameView: TextView, private val profileUsernameView: TextView) : Fragment() {
 
     private val usersApi = RetrofitHelper.getInstance().create(UsersApi::class.java)
 
@@ -76,6 +76,8 @@ class EditUsernameFragment : Fragment() {
                         this?.putString("session", username)
                         this?.apply()
                     }
+                    usernameView.text = username
+                    profileUsernameView.text = username
                     parentFragmentManager.popBackStack()
                 }
                 else {
