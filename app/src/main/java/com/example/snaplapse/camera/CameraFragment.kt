@@ -93,7 +93,7 @@ class CameraFragment : Fragment() {
             requestMultiplePermissions.launch(REQUIRED_PERMISSIONS)
         }
         sharedPref = activity?.getSharedPreferences(getString(R.string.preferences_file_key), Context.MODE_PRIVATE)
-        binding.spoofButton.visibility = View.VISIBLE
+//        binding.spoofButton.visibility = View.VISIBLE
         binding.spoofButton.setOnClickListener { openSpoofDialogFragment() }
         binding.shutterButton.setOnClickListener { takePhoto() }
         cameraExecutor = Executors.newSingleThreadExecutor()
