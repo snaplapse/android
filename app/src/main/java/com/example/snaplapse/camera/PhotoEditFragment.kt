@@ -37,6 +37,7 @@ import com.example.snaplapse.view_models.CameraViewModel
 import com.example.snaplapse.view_models.CurrentPlaceViewModel
 import com.example.snaplapse.view_models.ItemsViewModel2
 import java.io.ByteArrayOutputStream
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -161,7 +162,10 @@ class PhotoEditFragment(var currentPlaceViewModel: CurrentPlaceViewModel) : Frag
                     ).show()
                     val current = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
                     val text = current.toString() + "\n" + binding.textInput.text.toString()
-                    viewModel.appendProfilePhotos(ItemsViewModel2(response.body()?.id ?: 0, userID, imageBitmap, text))
+                    val parseFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                    val printFormat = DateTimeFormatter.ofPattern("MMMM dd, yyyy")
+                    val date = LocalDate.parse(response.body()!!.created.substring(0, 10), parseFormat)
+                    viewModel.appendProfilePhotos(ItemsViewModel2(response.body()?.id ?: 0, userID, imageBitmap, text, date.format(printFormat).toString()))
                     val imm = requireActivity().getSystemService(
                         Context.INPUT_METHOD_SERVICE
                     ) as InputMethodManager

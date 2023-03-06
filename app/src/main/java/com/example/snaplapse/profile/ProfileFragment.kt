@@ -21,6 +21,8 @@ import com.example.snaplapse.api.routes.UsersApi
 import com.example.snaplapse.settings.SettingsFragment
 import com.example.snaplapse.view_models.CameraViewModel
 import com.example.snaplapse.view_models.ItemsViewModel2
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 
 class ProfileFragment : Fragment() {
@@ -57,7 +59,10 @@ class ProfileFragment : Fragment() {
                             val decodedBitmap = Base64.decode(photo.bitmap, Base64.DEFAULT)
                             val bitmap =
                                 BitmapFactory.decodeByteArray(decodedBitmap, 0, decodedBitmap.size)
-                            data.add(ItemsViewModel2(photo.id, userId, bitmap, photo.description))
+                            val parseFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                            val printFormat = DateTimeFormatter.ofPattern("MMMM dd, yyyy")
+                            val date = LocalDate.parse(photo.created.substring(0, 10), parseFormat)
+                            data.add(ItemsViewModel2(photo.id, userId, bitmap, photo.description, date.format(printFormat).toString()))
                         }
                     }
                     val username = view.findViewById<TextView>(R.id.profile_username)

@@ -47,6 +47,7 @@ class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<Ite
         val img: ImageView = view.findViewById(R.id.imageView) as ImageView
         val userName = view.findViewById<TextView>(R.id.userName)
         val location = view.findViewById<TextView>(R.id.location)
+        val date = view.findViewById<TextView>(R.id.date)
         val likeCount = view.findViewById<TextView>(R.id.likeCount)
 
         val photoId: Int
@@ -65,6 +66,7 @@ class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<Ite
             img.setImageBitmap(item2.image)
         }
         text.text = description
+        date.text = item2!!.date
 
         lifecycleScope.launchWhenCreated {
             try {
@@ -80,6 +82,13 @@ class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<Ite
                     if (locationResponse.isSuccessful) {
                         location.text = locationResponse.body()!!.name
                         location.setOnClickListener {
+                            val timelineFragment = TimelineFragment(locationId)
+                            val fragmentTransaction = parentFragmentManager.beginTransaction()
+                            fragmentTransaction.replace(R.id.fragmentContainerView, timelineFragment)
+                            fragmentTransaction.addToBackStack(null)
+                            fragmentTransaction.commit()
+                        }
+                        date.setOnClickListener {
                             val timelineFragment = TimelineFragment(locationId)
                             val fragmentTransaction = parentFragmentManager.beginTransaction()
                             fragmentTransaction.replace(R.id.fragmentContainerView, timelineFragment)

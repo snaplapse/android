@@ -7,4 +7,5 @@ data class ItemsViewModel2(
     val user: Int,
     val image: Bitmap,
     val text: String,
+    val date: String,
     )

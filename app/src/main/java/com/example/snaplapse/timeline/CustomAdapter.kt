@@ -41,7 +41,7 @@ class CustomAdapter(private val mList: List<ItemsViewModel2>, private val fragme
         }
 
         // sets the text to the textview from our itemHolder class
-        holder.textView.text = itemsViewModel.text
+        holder.textView.text = itemsViewModel.date
     }
 
     // return the number of the items in the list
