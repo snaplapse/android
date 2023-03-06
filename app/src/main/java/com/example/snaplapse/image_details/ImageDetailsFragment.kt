@@ -38,6 +38,7 @@ class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<Ite
     private val photosApi = RetrofitHelper.getInstance().create(PhotosApi::class.java)
 
     private var userID: Int = 0
+    private var visibility = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,7 +60,6 @@ class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<Ite
 
         val photoId: Int
         val description: String
-        var visibility: Boolean
 
         userID = activity?.getSharedPreferences(getString(R.string.preferences_file_key), Context.MODE_PRIVATE)?.getInt("id", 0)!!
 
@@ -122,6 +122,7 @@ class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<Ite
             flagImage(userID)
         }
         getFlag(userID)
+        getFlagCount(photoId)
 
         deleteButton = view.findViewById(R.id.delete_button)
         deleteButton!!.setOnClickListener {
@@ -181,6 +182,22 @@ class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<Ite
                 }
             } catch (e: Exception) {
                 Log.e("getFlagError", e.toString())
+            }
+        }
+    }
+
+    private fun getFlagCount(id: Int) {
+        lifecycleScope.launchWhenCreated {
+            try {
+                val getFlagCountResponse = photosApi.getFlagCount(photo=item2?.id?:0)
+                if (getFlagCountResponse.isSuccessful) {
+                    if (getFlagCountResponse.body()!!.count >= 3) {
+                        visibilityButton!!.setImageResource(R.drawable.ic_baseline_visibility_off_flag_24)
+                        visibilityButton!!.isClickable = false
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("getFlagCountError", e.toString())
             }
         }
     }
@@ -263,6 +280,7 @@ class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<Ite
                         visibilityButton!!.setImageResource(R.drawable.ic_baseline_visibility_off_24)
                         toastText = "Image hidden"
                     }
+                    visibility = visible
                     Toast.makeText(activity, toastText, Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {

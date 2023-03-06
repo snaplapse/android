@@ -35,6 +35,11 @@ interface PhotosApi {
         @Query("photo") photo: Int,
     ): Response<PhotoActionListResponse>
 
+    @GET("/api/flags/")
+    suspend fun getFlagCount(
+        @Query("photo") photo: Int
+    ): Response<PhotoActionListResponse>
+
     @POST("/api/photos/")
     suspend fun upload(
         @Body photo: PhotoRequest,
