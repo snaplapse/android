@@ -49,7 +49,7 @@ class TimelineFragment(val locationId: Int) : Fragment() {
         val data = mutableListOf<ItemsViewModel2>()
         lifecycleScope.launchWhenCreated {
             try {
-                val response = photosApi.getPhotosByLocation(locationId)
+                val response = photosApi.getPhotosByLocation(locationId, "-created")
                 if (response.isSuccessful) {
                     for (photo in response.body()!!.results) {
                         if (!photo.bitmap.isEmpty()) {
