@@ -30,6 +30,8 @@ import com.example.snaplapse.api.routes.MapsApi
 import com.example.snaplapse.databinding.FragmentCameraBinding
 import com.example.snaplapse.view_models.CameraViewModel
 import com.example.snaplapse.view_models.CurrentPlaceViewModel
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.Place
 import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest
@@ -54,6 +56,10 @@ class CameraFragment : Fragment() {
     private lateinit var placesClient: PlacesClient
     private var locationPermissionGranted = false
     private var sharedPref: SharedPreferences? = null
+
+    private var latitude = 0F
+    private var longitude = 0F
+    private var spoof = false
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -88,9 +94,15 @@ class CameraFragment : Fragment() {
         }
         sharedPref = activity?.getSharedPreferences(getString(R.string.preferences_file_key), Context.MODE_PRIVATE)
         binding.spoofButton.visibility = View.VISIBLE
-        binding.spoofButton.setOnClickListener { SpoofDialogFragment().show(childFragmentManager, "")}
+        binding.spoofButton.setOnClickListener { openSpoofDialogFragment() }
         binding.shutterButton.setOnClickListener { takePhoto() }
         cameraExecutor = Executors.newSingleThreadExecutor()
+
+        childFragmentManager.setFragmentResultListener("spoofDialog", viewLifecycleOwner) { key, bundle ->
+            latitude = bundle.getFloat("latitude")
+            longitude = bundle.getFloat("longitude")
+            spoof = bundle.getBoolean("spoof")
+        }
     }
 
     override fun onDestroy() {
@@ -100,6 +112,14 @@ class CameraFragment : Fragment() {
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(safeContext, it) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun openSpoofDialogFragment() {
+        val spoofDialogFragment = SpoofDialogFragment()
+        spoofDialogFragment.setLatitude(latitude)
+        spoofDialogFragment.setLongitude(longitude)
+        spoofDialogFragment.setCheck(spoof)
+        spoofDialogFragment.show(childFragmentManager, "")
     }
 
     private fun startCamera() {
@@ -116,6 +136,7 @@ class CameraFragment : Fragment() {
         }, ContextCompat.getMainExecutor(safeContext))
     }
 
+    @SuppressLint("MissingPermission")
     private fun takePhoto() {
         val imageCapture = imageCapture ?: return
         imageCapture.takePicture(ContextCompat.getMainExecutor(safeContext), object : ImageCapture.OnImageCapturedCallback() {
@@ -136,61 +157,100 @@ class CameraFragment : Fragment() {
                 )
                 viewModel.setImageBitmap(imageBitmap)
 
-                if (sharedPref!!.contains("latitude") && sharedPref!!.contains("longitude") && binding.spoofButton.visibility != View.GONE) {
-                    lifecycleScope.launchWhenCreated {
-                        try {
-                            val sb = StringBuilder()
-                            sb.append(sharedPref?.getFloat("latitude", 0F)).append(",").append(sharedPref?.getFloat("longitude", 0F))
+                var coordsString = ""
 
-                            val params = HashMap<String, String>()
-                            params["key"] = BuildConfig.MAPS_API_KEY
-                            params["location"] = sb.toString()
-                            params["rankby"] = "distance"
-
-                            val mapsResponse = mapsApi.getNearbyPlaces(params)
-                            if (mapsResponse.isSuccessful) {
-                                val json = JSONObject(mapsResponse.body().toString())
-                                val likelyPlace = JSONObject(json.getJSONArray("results")[0].toString())
-
-                                val types = ArrayList<String>()
-                                for (i in 0 until likelyPlace.getJSONArray("types").length()) {
-                                    types.add(likelyPlace.getJSONArray("types")[i].toString())
-                                }
-
-                                val transaction = parentFragmentManager.beginTransaction()
-                                transaction.add(R.id.fragmentContainerView,
-                                    PhotoEditFragment(CurrentPlaceViewModel
-                                        (
-                                            likelyPlace.getString("name"),
-                                            likelyPlace.getString("vicinity"),
-                                            likelyPlace.getString("place_id"),
-                                            likelyPlace.getJSONObject("geometry").getJSONObject("location").getDouble("lat"),
-                                            likelyPlace.getJSONObject("geometry").getJSONObject("location").getDouble("lng"),
-                                            types
-                                        )
-                                    )
-                                )
-                                transaction.commit()
-                                image.close()
-                            }
-                            else {
-                                Log.i("mapsResponseError", "")
-                            }
-
-                        } catch (e: Exception) {
-                            Log.i("NearbySearchError", e.toString())
-                        }
-                    }
+                if (binding.spoofButton.visibility != View.GONE && spoof) {
+                    val sb = StringBuilder()
+                    sb.append(latitude).append(",").append(longitude)
+                    coordsString = sb.toString()
+                    callNearbySearch(coordsString, image)
                 }
                 else {
-                    useCurrentPlace(image)
+                    if (locationPermissionGranted) {
+                        Places.initialize(safeContext, BuildConfig.MAPS_API_KEY)
+                        placesClient = Places.createClient(safeContext)
+
+                        // Use fields to define the data types to return.
+                        val placeFields = listOf(Place.Field.NAME, Place.Field.ADDRESS, Place.Field.LAT_LNG, Place.Field.TYPES, Place.Field.ID)
+
+                        // Use the builder to create a FindCurrentPlaceRequest.
+                        val request = FindCurrentPlaceRequest.newInstance(placeFields)
+
+                        // Get the likely places - that is, the businesses and other points of interest that
+                        // are the best match for the device's current location.
+
+                        val placeResult = placesClient.findCurrentPlace(request)
+                        placeResult.addOnCompleteListener { task ->
+                            if (task.isSuccessful && task.result != null) {
+                                val likelyPlace = task.result.placeLikelihoods[0].place
+                                val sb = StringBuilder()
+                                sb.append(likelyPlace.latLng.latitude).append(",").append(likelyPlace.latLng.longitude)
+                                coordsString = sb.toString()
+                                callNearbySearch(coordsString, image)
+                            }
+                        }
+                    }
+                    else {
+                        getLocationPermission()
+                    }
                 }
             }
             override fun onError(exception: ImageCaptureException) {}
         })
     }
 
-    @SuppressLint("MissingPermission")
+    private fun callNearbySearch(coordsString: String, image: ImageProxy) {
+        lifecycleScope.launchWhenCreated {
+            try {
+                val params = HashMap<String, String>()
+                params["key"] = BuildConfig.MAPS_API_KEY
+                params["location"] = coordsString
+                params["rankby"] = "distance"
+
+                val mapsResponse = mapsApi.getNearbyPlaces(params)
+                if (mapsResponse.isSuccessful) {
+                    val json = JSONObject(mapsResponse.body().toString())
+                    val likelyPlacesJSON = json.getJSONArray("results")
+
+                    val viewModels = ArrayList<CurrentPlaceViewModel>()
+
+                    for (i in 0 until likelyPlacesJSON.length()) {
+                        val place = JSONObject(likelyPlacesJSON[i].toString())
+
+                        val types = ArrayList<String>()
+                        for (i in 0 until place.getJSONArray("types").length()) {
+                            types.add(place.getJSONArray("types")[i].toString())
+                        }
+
+                        viewModels.add(CurrentPlaceViewModel
+                            (
+                            place.getString("name"),
+                            place.getString("vicinity"),
+                            place.getString("place_id"),
+                            place.getJSONObject("geometry").getJSONObject("location").getDouble("lat"),
+                            place.getJSONObject("geometry").getJSONObject("location").getDouble("lng"),
+                            types
+                        )
+                        )
+                    }
+
+                    val transaction = parentFragmentManager.beginTransaction()
+                    transaction.add(R.id.fragmentContainerView,
+                        PhotoEditFragment(viewModels))
+                    transaction.commit()
+                    image.close()
+                }
+                else {
+                    Log.i("mapsResponseError", "")
+                }
+
+            } catch (e: Exception) {
+                Log.i("NearbySearchError", e.toString())
+            }
+        }
+    }
+
+    /*@SuppressLint("MissingPermission")
     private fun useCurrentPlace(image: ImageProxy) {
         if (locationPermissionGranted) {
             Places.initialize(safeContext, BuildConfig.MAPS_API_KEY)
@@ -229,21 +289,21 @@ class CameraFragment : Fragment() {
                                     types.add(likelyPlace.getJSONArray("types")[i].toString())
                                 }
 
-                                val transaction = parentFragmentManager.beginTransaction()
-                                transaction.add(R.id.fragmentContainerView,
-                                    PhotoEditFragment(CurrentPlaceViewModel
-                                        (
-                                            likelyPlace.getString("name"),
-                                            likelyPlace.getString("formatted_address"),
-                                            likelyPlace.getString("place_id"),
-                                            likelyPlace.getJSONObject("geometry").getJSONObject("location").getDouble("lat"),
-                                            likelyPlace.getJSONObject("geometry").getJSONObject("location").getDouble("lng"),
-                                            types
-                                        )
-                                    )
-                                )
-                                transaction.commit()
-                                image.close()
+//                                val transaction = parentFragmentManager.beginTransaction()
+//                                transaction.add(R.id.fragmentContainerView,
+//                                    PhotoEditFragment(CurrentPlaceViewModel
+//                                        (
+//                                            likelyPlace.getString("name"),
+//                                            likelyPlace.getString("formatted_address"),
+//                                            likelyPlace.getString("place_id"),
+//                                            likelyPlace.getJSONObject("geometry").getJSONObject("location").getDouble("lat"),
+//                                            likelyPlace.getJSONObject("geometry").getJSONObject("location").getDouble("lng"),
+//                                            types
+//                                        )
+//                                    )
+//                                )
+//                                transaction.commit()
+//                                image.close()
 
                             }
                         } catch (e: Exception) {
@@ -255,7 +315,7 @@ class CameraFragment : Fragment() {
         } else {
             getLocationPermission()
         }
-    }
+    }*/
 
     private fun getLocationPermission() {
         /*

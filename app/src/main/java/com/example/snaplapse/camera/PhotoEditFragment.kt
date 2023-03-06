@@ -31,7 +31,7 @@ import java.io.ByteArrayOutputStream
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class PhotoEditFragment(var currentPlaceViewModel: CurrentPlaceViewModel) : Fragment() {
+class PhotoEditFragment(var currentPlaceViewModel: List<CurrentPlaceViewModel>) : Fragment() {
     private lateinit var safeContext: Context
 
     private lateinit var _binding: FragmentPhotoEditBinding
@@ -46,6 +46,7 @@ class PhotoEditFragment(var currentPlaceViewModel: CurrentPlaceViewModel) : Frag
     private val categoriesApi = RetrofitHelper.getInstance().create(CategoriesApi::class.java)
     private val locationsApi = RetrofitHelper.getInstance().create(LocationsApi::class.java)
 
+    private var selectedLocationIndex = 0
     private var description = ""
 
     override fun onAttach(context: Context) {
@@ -85,11 +86,16 @@ class PhotoEditFragment(var currentPlaceViewModel: CurrentPlaceViewModel) : Frag
         childFragmentManager.setFragmentResultListener("descriptionDialog", viewLifecycleOwner) { key, bundle ->
             description = bundle.getString("descriptionKey").toString()
         }
+
+        childFragmentManager.setFragmentResultListener("locationDialog", viewLifecycleOwner) { key, bundle ->
+            selectedLocationIndex = bundle.getInt("locationKey")
+        }
     }
 
     private fun openSetLocationDialog() {
         val locationDialogFragment = LocationDialogFragment()
-        locationDialogFragment.setLocation(currentPlaceViewModel.name)
+        locationDialogFragment.setItem(selectedLocationIndex)
+        locationDialogFragment.setList(currentPlaceViewModel)
         locationDialogFragment.show(childFragmentManager, "")
     }
 
@@ -123,13 +129,13 @@ class PhotoEditFragment(var currentPlaceViewModel: CurrentPlaceViewModel) : Frag
             try {
                 var locationId = 0
 
-                val locationGetResponse = locationsApi.getLocationByGoogleId(currentPlaceViewModel.id)
+                val locationGetResponse = locationsApi.getLocationByGoogleId(currentPlaceViewModel[selectedLocationIndex].id)
                 if (locationGetResponse.isSuccessful) {
                     locationId = locationGetResponse.body()!!.id
                 }
                 else {
                     val categories: MutableList<Int> = ArrayList()
-                    for (item in currentPlaceViewModel.types) {
+                    for (item in currentPlaceViewModel[selectedLocationIndex].types) {
                         val categoryGetResponse = categoriesApi.getCategoryByName(item)
                         if (categoryGetResponse.isSuccessful) {
                             categories.add(categoryGetResponse.body()!!.id)
@@ -151,7 +157,7 @@ class PhotoEditFragment(var currentPlaceViewModel: CurrentPlaceViewModel) : Frag
                         }
                     }
 
-                    val locationRequestBody = LocationRequest(name=currentPlaceViewModel.name, longitude=currentPlaceViewModel.longitude, latitude=currentPlaceViewModel.latitude, categories=categories, google_id=currentPlaceViewModel.id)
+                    val locationRequestBody = LocationRequest(name=currentPlaceViewModel[selectedLocationIndex].name, longitude=currentPlaceViewModel[selectedLocationIndex].longitude, latitude=currentPlaceViewModel[selectedLocationIndex].latitude, categories=categories, google_id=currentPlaceViewModel[selectedLocationIndex].id)
                     val locationPostResponse = locationsApi.createLocation(locationRequestBody)
                     if (locationPostResponse.isSuccessful) {
                         locationId = locationPostResponse.body()!!.id
