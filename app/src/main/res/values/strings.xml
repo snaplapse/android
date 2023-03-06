@@ -53,7 +53,7 @@
     <string name="date_joined_tag">Date Joined: January 01 1970</string>
     <string name="photo_timeline_tag">Uploaded %s photos into %s unique timelines</string>
     <string name="change_avatar_button">Change Avatar</string>
-    <string name="edit_username_button">Edit Username</string>
+    <string name="edit_username_button">Change Username</string>
     <string name="change_password_button">Change Password</string>
     <string name="about_button">About</string>
     <string name="log_out_button">Log Out</string>

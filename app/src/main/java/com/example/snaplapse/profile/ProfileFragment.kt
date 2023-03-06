@@ -17,7 +17,6 @@ import com.example.snaplapse.MainActivity
 import com.example.snaplapse.R
 import com.example.snaplapse.api.RetrofitHelper
 import com.example.snaplapse.api.routes.PhotosApi
-import com.example.snaplapse.api.routes.UsersApi
 import com.example.snaplapse.settings.SettingsFragment
 import com.example.snaplapse.view_models.CameraViewModel
 import com.example.snaplapse.view_models.ItemsViewModel2
@@ -29,6 +28,7 @@ class ProfileFragment : Fragment() {
     private val viewModel: CameraViewModel by activityViewModels()
     private var usernameText: String? = null
     private var userId: Int = 0
+    private val fragment = this
 
     private val photosApi = RetrofitHelper.getInstance().create(PhotosApi::class.java)
 
@@ -67,7 +67,7 @@ class ProfileFragment : Fragment() {
                     }
                     val username = view.findViewById<TextView>(R.id.profile_username)
                     username.text = usernameText
-                    val adapter = ProfileRecyclerViewAdapter(data)
+                    val adapter = ProfileRecyclerViewAdapter(data, parentFragmentManager, fragment)
                     recyclerview.adapter = adapter
                 }
                 else {
@@ -81,7 +81,8 @@ class ProfileFragment : Fragment() {
         val settingsButton: ImageButton = view.findViewById(R.id.settings_button)
         settingsButton.setOnClickListener {
             val transaction = parentFragmentManager.beginTransaction()
-            transaction.replace(R.id.fragmentContainerView, SettingsFragment())
+            transaction.hide(this)
+            transaction.add(R.id.fragmentContainerView, SettingsFragment())
             transaction.addToBackStack(null)
             transaction.commit()
         }

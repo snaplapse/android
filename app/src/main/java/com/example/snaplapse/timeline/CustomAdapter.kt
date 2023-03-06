@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.snaplapse.R
@@ -13,7 +14,11 @@ import com.example.snaplapse.view_models.ItemsViewModel
 import com.example.snaplapse.view_models.ItemsViewModel2
 
 
-class CustomAdapter(private val mList: List<ItemsViewModel2>, private val fragmentManager: FragmentManager) : RecyclerView.Adapter<CustomAdapter.ViewHolder>() {
+class CustomAdapter(
+    private val mList: List<ItemsViewModel2>,
+    private val fragmentManager: FragmentManager,
+    private val fragment: Fragment
+    ) : RecyclerView.Adapter<CustomAdapter.ViewHolder>() {
 
     // create new views
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -34,10 +39,11 @@ class CustomAdapter(private val mList: List<ItemsViewModel2>, private val fragme
         holder.imageView.setImageBitmap(itemsViewModel.image)
         holder.imageView.setOnClickListener {
             val imageDetailsFragment = ImageDetailsFragment(ItemsViewModel(position, 1, 0, ""), listOf(), itemsViewModel)
-            val fragmentTransaction = fragmentManager.beginTransaction()
-            fragmentTransaction.replace(R.id.fragmentContainerView, imageDetailsFragment)
-            fragmentTransaction.addToBackStack(null)
-            fragmentTransaction.commit()
+            val transaction = fragmentManager.beginTransaction()
+            transaction.hide(fragment)
+            transaction.add(R.id.fragmentContainerView, imageDetailsFragment)
+            transaction.addToBackStack(null)
+            transaction.commit()
         }
 
         // sets the text to the textview from our itemHolder class

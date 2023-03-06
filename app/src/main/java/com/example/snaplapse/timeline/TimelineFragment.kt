@@ -47,6 +47,7 @@ class TimelineFragment(val locationId: Int) : Fragment() {
         recyclerview.layoutManager = LinearLayoutManager(MainActivity())
 
         val data = mutableListOf<ItemsViewModel2>()
+        val fragment = this
         lifecycleScope.launchWhenCreated {
             try {
                 val response = photosApi.getPhotosByLocation(locationId, "-created")
@@ -62,7 +63,7 @@ class TimelineFragment(val locationId: Int) : Fragment() {
                             data.add(ItemsViewModel2(photo.id, photo.user, bitmap, photo.description, date.format(printFormat).toString()))
                         }
                     }
-                    val adapter = CustomAdapter(data, parentFragmentManager)
+                    val adapter = CustomAdapter(data, parentFragmentManager, fragment)
                     recyclerview.adapter = adapter
                 }
                 val locationResponse = locationsApi.getLocation(locationId)

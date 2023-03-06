@@ -1,19 +1,22 @@
 package com.example.snaplapse.for_you
 
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.snaplapse.R
 import com.example.snaplapse.timeline.TimelineFragment
 import com.example.snaplapse.view_models.ForYouViewModel
+import androidx.fragment.app.Fragment
 
-class ForYouAdapter(private val mList: List<ForYouViewModel>, private val fragmentManager: FragmentManager) : RecyclerView.Adapter<ForYouAdapter.ViewHolder>() {
+class ForYouAdapter(
+    private val mList: List<ForYouViewModel>,
+    private val fragmentManager: FragmentManager,
+    private val fragment: Fragment
+    ) : RecyclerView.Adapter<ForYouAdapter.ViewHolder>() {
 
     // create new views
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -34,10 +37,11 @@ class ForYouAdapter(private val mList: List<ForYouViewModel>, private val fragme
         holder.imageView.setImageBitmap(forYouViewModel.thumbnail)
         holder.imageView.setOnClickListener{
             val timelineFragment = TimelineFragment(forYouViewModel.locationId)
-            val fragmentTransaction = fragmentManager.beginTransaction()
-            fragmentTransaction.replace(R.id.fragmentContainerView, timelineFragment)
-            fragmentTransaction.addToBackStack(null)
-            fragmentTransaction.commit()
+            val transaction = fragmentManager.beginTransaction()
+            transaction.hide(fragment)
+            transaction.add(R.id.fragmentContainerView, timelineFragment)
+            transaction.addToBackStack(null)
+            transaction.commit()
         }
 
         // sets the text to the textview from our itemHolder class
