@@ -9,13 +9,15 @@ interface PhotosApi {
     suspend fun getPhotosByUser(
         @Query("user") user: Int,
         @Query("sort_by") sortBy: String? = null,
+        @Query("page") page: Int? = null
     ): Response<PhotoListResponse>
 
     @GET("/api/photos/")
     suspend fun getPhotosByLocation(
         @Query("location") user: Int,
         @Query("sort_by") sortBy: String? = null,
-        @Query("count") count: Int? = null
+        @Query("count") count: Int? = null,
+        @Query("page") page: Int? = null
     ): Response<PhotoListResponse>
 
     @GET("/api/photos/{id}")
