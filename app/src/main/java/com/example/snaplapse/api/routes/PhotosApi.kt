@@ -1,11 +1,6 @@
 package com.example.snaplapse.api.routes
 
-import com.example.snaplapse.api.data.photo.PhotoActionRequest
-import com.example.snaplapse.api.data.photo.PhotoActionResponse
-import com.example.snaplapse.api.data.photo.PhotoActionListResponse
-import com.example.snaplapse.api.data.photo.PhotoRequest
-import com.example.snaplapse.api.data.photo.PhotoResponse
-import com.example.snaplapse.api.data.photo.PhotoListResponse
+import com.example.snaplapse.api.data.photo.*
 import retrofit2.Response
 import retrofit2.http.*
 
@@ -58,6 +53,11 @@ interface PhotosApi {
     @PUT("/api/photos/{id}/")
     suspend fun edit(
         @Path("id") id: Int,
+    ): Response<PhotoResponse>
+
+    @PATCH("/api/photos/{id}/")
+    suspend fun private(
+        @Path("id") id: Int, @Body photoVisibilityRequest: PhotoVisibilityRequest
     ): Response<PhotoResponse>
 
     @DELETE("/api/photos/{id}/")

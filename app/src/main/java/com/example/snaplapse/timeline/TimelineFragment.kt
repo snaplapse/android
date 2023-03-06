@@ -60,7 +60,7 @@ class TimelineFragment(val locationId: Int) : Fragment() {
                             val parseFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd")
                             val printFormat = DateTimeFormatter.ofPattern("MMMM dd, yyyy")
                             val date = LocalDate.parse(photo.created.substring(0, 10), parseFormat)
-                            data.add(ItemsViewModel2(photo.id, photo.user, bitmap, photo.description, date.format(printFormat).toString()))
+                            data.add(ItemsViewModel2(photo.id, photo.user, bitmap, photo.description, date.format(printFormat).toString(), photo.visible))
                         }
                     }
                     val adapter = CustomAdapter(data, parentFragmentManager, fragment)

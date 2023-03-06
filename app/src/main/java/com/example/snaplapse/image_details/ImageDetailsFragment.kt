@@ -16,9 +16,12 @@ import androidx.lifecycle.lifecycleScope
 import com.example.snaplapse.R
 import com.example.snaplapse.api.RetrofitHelper
 import com.example.snaplapse.api.data.photo.PhotoActionRequest
+import com.example.snaplapse.api.data.photo.PhotoVisibilityRequest
 import com.example.snaplapse.api.routes.LocationsApi
 import com.example.snaplapse.api.routes.PhotosApi
 import com.example.snaplapse.api.routes.UsersApi
+import com.example.snaplapse.camera.CameraFragment
+import com.example.snaplapse.profile.ProfileFragment
 import com.example.snaplapse.timeline.TimelineFragment
 import com.example.snaplapse.view_models.ItemsViewModel
 import com.example.snaplapse.view_models.ItemsViewModel2
@@ -27,6 +30,8 @@ class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<Ite
 
     private var likeButton: ImageButton? = null
     private var flagButton: ImageButton? = null
+    private var deleteButton: ImageButton? = null
+    private var visibilityButton: ImageButton? = null
 
     private val usersApi = RetrofitHelper.getInstance().create(UsersApi::class.java)
     private val locationsApi = RetrofitHelper.getInstance().create(LocationsApi::class.java)
@@ -54,6 +59,7 @@ class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<Ite
 
         val photoId: Int
         val description: String
+        var visibility: Boolean
 
         userID = activity?.getSharedPreferences(getString(R.string.preferences_file_key), Context.MODE_PRIVATE)?.getInt("id", 0)!!
 
@@ -62,10 +68,12 @@ class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<Ite
             description = item.text
             img.setImageResource(item.image)
             img.setOnTouchListener(OnSwipeTouchListener(activity, item, mList, view))
+            visibility = true
         } else {
             photoId = item2.id
             description = item2.text
             img.setImageBitmap(item2.image)
+            visibility = item2.visible
         }
         text.text = description
         date.text = item2!!.date
@@ -114,6 +122,31 @@ class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<Ite
             flagImage(userID)
         }
         getFlag(userID)
+
+        deleteButton = view.findViewById(R.id.delete_button)
+        deleteButton!!.setOnClickListener {
+            DeletePhotoDialogFragment().show(childFragmentManager, "")
+        }
+
+        visibilityButton = view.findViewById(R.id.visibility_button)
+        visibilityButton!!.setOnClickListener {
+            changeVisibility(photoId, !visibility)
+        }
+        if (!visibility) {
+            visibilityButton!!.setImageResource(R.drawable.ic_baseline_visibility_off_24)
+        }
+
+        if (userID != item2.user) {
+            deleteButton!!.visibility = View.GONE
+            visibilityButton!!.visibility = View.GONE
+        }
+        else {
+            flagButton!!.visibility = View.GONE
+        }
+
+        childFragmentManager.setFragmentResultListener("deletePhoto", viewLifecycleOwner) { key, bundle ->
+            deletePhoto(photoId)
+        }
 
         val backButton = view.findViewById<ImageButton>(R.id.image_details_back_button)
         backButton.setOnClickListener {
@@ -215,5 +248,43 @@ class ImageDetailsFragment(var item: ItemsViewModel, private val mList: List<Ite
             }
         }
 //        FlagDialogFragment().show(childFragmentManager, "")
+    }
+
+    private fun changeVisibility(id: Int, visible: Boolean) {
+        lifecycleScope.launchWhenCreated {
+            try {
+                val privateResponse = photosApi.private(id, PhotoVisibilityRequest(visible=visible))
+                if (privateResponse.isSuccessful) {
+                    var toastText = "Image visible"
+                    if (visible) {
+                        visibilityButton!!.setImageResource(R.drawable.ic_baseline_visibility_24)
+                    }
+                    else {
+                        visibilityButton!!.setImageResource(R.drawable.ic_baseline_visibility_off_24)
+                        toastText = "Image hidden"
+                    }
+                    Toast.makeText(activity, toastText, Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Log.e("ChangeVisibilityError", e.toString())
+            }
+        }
+    }
+
+    private fun deletePhoto(id: Int) {
+        lifecycleScope.launchWhenCreated {
+            try {
+                val deleteResponse = photosApi.delete(id)
+                if (deleteResponse.isSuccessful) {
+                    parentFragmentManager.popBackStack()
+                }
+                else {
+                    Toast.makeText(activity, "Error deleting photo", Toast.LENGTH_SHORT).show()
+                }
+            } catch (e: Exception) {
+                Log.e("ChangeVisibilityError", e.toString())
+            }
+        }
+
     }
 }

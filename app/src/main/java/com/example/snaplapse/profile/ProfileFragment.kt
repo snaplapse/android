@@ -62,7 +62,7 @@ class ProfileFragment : Fragment() {
                             val parseFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd")
                             val printFormat = DateTimeFormatter.ofPattern("MMMM dd, yyyy")
                             val date = LocalDate.parse(photo.created.substring(0, 10), parseFormat)
-                            data.add(ItemsViewModel2(photo.id, userId, bitmap, photo.description, date.format(printFormat).toString()))
+                            data.add(ItemsViewModel2(photo.id, userId, bitmap, photo.description, date.format(printFormat).toString(), photo.visible))
                         }
                     }
                     val username = view.findViewById<TextView>(R.id.profile_username)
