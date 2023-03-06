@@ -8,4 +8,5 @@ data class ItemsViewModel2(
     val image: Bitmap,
     val text: String,
     val date: String,
+    val visible: Boolean
     )

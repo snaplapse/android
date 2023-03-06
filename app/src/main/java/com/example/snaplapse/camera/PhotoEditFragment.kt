@@ -181,7 +181,7 @@ class PhotoEditFragment(var currentPlaceViewModel: List<CurrentPlaceViewModel>) 
                     val parseFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd")
                     val printFormat = DateTimeFormatter.ofPattern("MMMM dd, yyyy")
                     val date = LocalDate.parse(response.body()!!.created.substring(0, 10), parseFormat)
-                    viewModel.appendProfilePhotos(ItemsViewModel2(response.body()?.id ?: 0, userID, imageBitmap, text, date.format(printFormat).toString()))
+                    viewModel.appendProfilePhotos(ItemsViewModel2(response.body()?.id ?: 0, userID, imageBitmap, text, date.format(printFormat).toString(), true))
                     val imm = requireActivity().getSystemService(
                         Context.INPUT_METHOD_SERVICE
                     ) as InputMethodManager
