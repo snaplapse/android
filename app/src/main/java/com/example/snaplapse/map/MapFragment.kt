@@ -258,25 +258,16 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
 
                 if (locations != null) {
                     for (location in locations) {
-                        val photosResponse = photosApi.getPhotosByLocation(location.id)
+                        val photosResponse = photosApi.getPhotosByLocation(location.id, visible = true)
                         val photos = photosResponse.body()?.results
                         if (photos?.isNotEmpty() == true) {
-                            var checkVisible = false
-                            for (photo in photos) {
-                                if (photo.visible)
-                                {
-                                    checkVisible = true
-                                }
-                            }
-                            if (checkVisible) {
-                                val marker1 = LatLng(location.latitude, location.longitude)
-                                var place = map.addMarker(
-                                    MarkerOptions()
-                                        .position(marker1)
-                                        .title(location.name) // this is just temporary until we put actual data in
-                                )
-                                place?.tag = location.id //use the location id here to reference the location when clicked
-                            }
+                            val marker1 = LatLng(location.latitude, location.longitude)
+                            var place = map.addMarker(
+                                MarkerOptions()
+                                    .position(marker1)
+                                    .title(location.name) // this is just temporary until we put actual data in
+                            )
+                            place?.tag = location.id //use the location id here to reference the location when clicked
                         }
                     }
                 }

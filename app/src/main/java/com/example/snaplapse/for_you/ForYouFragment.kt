@@ -122,7 +122,7 @@ class ForYouFragment : Fragment() {
 
                 if (recommendations != null) {
                     for (location in recommendations) {
-                        val photosResponse = photosApi.getPhotosByLocation(location.id, "-created", 1)
+                        val photosResponse = photosApi.getPhotosByLocation(location.id, "-created", 1, visible = true)
                         val photos = photosResponse.body()?.results
                         if (photos?.isNotEmpty() == true) {
                             val mostRecentPhoto = photos[0]
