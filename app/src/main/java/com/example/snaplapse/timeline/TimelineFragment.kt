@@ -53,7 +53,7 @@ class TimelineFragment(val locationId: Int) : Fragment() {
                 var page = 1
 
                 while (true) {
-                    val response = photosApi.getPhotosByLocation(locationId, "-created", null, page)
+                    val response = photosApi.getPhotosByLocation(locationId, "-created", null, page, visible = true)
                     if (response.isSuccessful) {
                         for (photo in response.body()!!.results) {
                             if (!photo.bitmap.isEmpty()) {
