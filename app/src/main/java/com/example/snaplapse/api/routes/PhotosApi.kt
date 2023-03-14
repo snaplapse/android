@@ -21,6 +21,17 @@ interface PhotosApi {
         @Query("visible") visible: Boolean? = null
     ): Response<PhotoListResponse>
 
+    @GET("/api/photos/")
+    suspend fun getPhotos(
+        @Query("page") page: Int? = null,
+    ): Response<PhotoListResponse>
+
+    @PATCH("/api/photos/{id}/")
+    suspend fun patchPhoto(
+        @Path("id") id: Int?,
+        @Body bitmap: PhotoPatchRequest,
+    ): Response<PhotoResponse>
+
     @GET("/api/photos/count/")
     suspend fun getPhotoCount(
         @Query("location") user: Int,
@@ -30,7 +41,7 @@ interface PhotosApi {
         @Query("visible") visible: Boolean? = null
     ): Response<PhotoCountResponse>
 
-    @GET("/api/photos/{id}")
+    @GET("/api/photos/{id}/")
     suspend fun getPhoto(
         @Path("id") id: Int?,
     ): Response<PhotoResponse>
