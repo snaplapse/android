@@ -111,7 +111,7 @@ class PhotoEditFragment(var currentPlaceViewModel: List<CurrentPlaceViewModel>) 
             Toast.makeText(safeContext, "Please provide a description.", Toast.LENGTH_SHORT).show()
         } else {
             val byteArrayOutputStream = ByteArrayOutputStream()
-            imageBitmap.compress(Bitmap.CompressFormat.WEBP_LOSSY, 0, byteArrayOutputStream)
+            imageBitmap.compress(Bitmap.CompressFormat.WEBP_LOSSY, 50, byteArrayOutputStream)
             val byteArray = byteArrayOutputStream.toByteArray()
             val encodedBitmap: String = Base64.encodeToString(byteArray, Base64.NO_WRAP)
             uploadToServer(description, encodedBitmap)
