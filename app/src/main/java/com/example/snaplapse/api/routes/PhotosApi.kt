@@ -21,6 +21,15 @@ interface PhotosApi {
         @Query("visible") visible: Boolean? = null
     ): Response<PhotoListResponse>
 
+    @GET("/api/photos/count/")
+    suspend fun getPhotoCount(
+        @Query("location") user: Int,
+        @Query("sort_by") sortBy: String? = null,
+        @Query("count") count: Int? = null,
+        @Query("page") page: Int? = null,
+        @Query("visible") visible: Boolean? = null
+    ): Response<PhotoCountResponse>
+
     @GET("/api/photos/{id}")
     suspend fun getPhoto(
         @Path("id") id: Int?,
