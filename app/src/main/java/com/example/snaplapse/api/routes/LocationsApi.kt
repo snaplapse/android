@@ -8,7 +8,7 @@ import retrofit2.http.*
 
 interface LocationsApi {
     @GET("/api/locations/")
-    suspend fun getLocations(): Response<LocationListResponse>
+    suspend fun getLocations(@Query("page") page: Int? = null): Response<LocationListResponse>
 
     @GET("/api/locations/{id}")
     suspend fun getLocation(@Path("id") id: Int?): Response<LocationResponse>
