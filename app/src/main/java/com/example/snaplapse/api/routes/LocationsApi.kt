@@ -14,10 +14,13 @@ interface LocationsApi {
     suspend fun getLocation(@Path("id") id: Int?): Response<LocationResponse>
 
     @GET("/api/locations/recommendations")
-    suspend fun getRecommendations(@Query("userId") userId: Int,
-                                @Query("coordinates", encoded = true) coordinates: String,
-                                @Query("radius") radius: Int,
-                                @Query("count") count: Int): Response<LocationListResponse>
+    suspend fun getRecommendations(
+        @Query("userId") userId: Int,
+        @Query("coordinates", encoded = true) coordinates: String,
+        @Query("radius") radius: Int,
+        @Query("count") count: Int,
+        @Query("page") page: Int? = null
+    ): Response<LocationListResponse>
 
     @GET("/api/locations/googleId/{google_id}/")
     suspend fun getLocationByGoogleId(@Path("google_id") google_id: String): Response<LocationResponse>

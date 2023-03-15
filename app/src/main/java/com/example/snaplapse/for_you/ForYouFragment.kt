@@ -116,29 +116,39 @@ class ForYouFragment : Fragment() {
                 val recyclerView = view.findViewById<RecyclerView>(R.id.for_you_view)
                 recyclerView.layoutManager = LinearLayoutManager(MainActivity())
 
-//                val coordinates = "43.4723,-80.5449" // UWaterloo coordinates for testing
-                val recResponse = locationsApi.getRecommendations(userID, currentCoordinates, range, 20)
-                val recommendations = recResponse.body()?.results
+                var page = 1 //paginate for all 20 recommendations
+                var quickLoadCounter = 1
+                while (true) {
+    //                val coordinates = "43.4723,-80.5449" // UWaterloo coordinates for testing
+                    val recResponse = locationsApi.getRecommendations(userID, currentCoordinates, range, 20, page=page)
+                    if (recResponse.isSuccessful) {
+                        for (location in recResponse.body()!!.results) {
+                            val photosResponse = photosApi.getPhotosByLocation(location.id, "-created", 1, visible = true)
+                            val photos = photosResponse.body()?.results
+                            if (photos?.isNotEmpty() == true) {
+                                val mostRecentPhoto = photos[0]
+                                val bmpRaw = mostRecentPhoto?.bitmap
+                                val imageBytes = Base64.decode(bmpRaw, 0)
+                                var image =
+                                    BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
 
-                if (recommendations != null) {
-                    for (location in recommendations) {
-                        val photosResponse = photosApi.getPhotosByLocation(location.id, "-created", 1, visible = true)
-                        val photos = photosResponse.body()?.results
-                        if (photos?.isNotEmpty() == true) {
-                            val mostRecentPhoto = photos[0]
-                            val bmpRaw = mostRecentPhoto?.bitmap
-                            val imageBytes = Base64.decode(bmpRaw, 0)
-                            var image =
-                                BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-
-                            val card = ForYouViewModel(image, location.name, location.id)
-                            cards.add(card)
+                                val card = ForYouViewModel(image, location.name, location.id)
+                                cards.add(card)
+                                if (quickLoadCounter == 3) {
+                                    val adapter = ForYouAdapter(cards, parentFragmentManager, fragment)
+                                    recyclerView.adapter = adapter
+                                }
+                                quickLoadCounter += 1
+                            }
                         }
+                    } else {
+                        break
                     }
-                }
 
-                val adapter = ForYouAdapter(cards, parentFragmentManager, fragment)
-                recyclerView.adapter = adapter
+                    val adapter = ForYouAdapter(cards, parentFragmentManager, fragment)
+                    recyclerView.adapter = adapter
+                    page += 1
+                }
 
             } catch (e: Exception) {
                 Log.e("ForYouPageError", e.toString())
