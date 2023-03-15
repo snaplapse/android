@@ -253,24 +253,31 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
     private fun showPlaceMarkers() {
         lifecycleScope.launchWhenCreated {
             try {
-                val locResponse = locationsApi.getLocations()
-                val locations = locResponse.body()?.results
+                var page = 1 //paginate for all 20 recommendations
+                while (true) {
+                    //                val coordinates = "43.4723,-80.5449" // UWaterloo coordinates for testing
 
-                if (locations != null) {
-                    for (location in locations) {
-                        val photosResponse = photosApi.getPhotoCount(location.id, visible=true)
-                        if (photosResponse.isSuccessful) {
-                            if (photosResponse.body()!!.count > 0) {
-                                val marker1 = LatLng(location.latitude, location.longitude)
-                                var place = map.addMarker(
-                                    MarkerOptions()
-                                        .position(marker1)
-                                        .title(location.name)
-                                )
-                                place?.tag = location.id // use the location id here to reference the location when clicked
+                    val locResponse = locationsApi.getLocations(page=page)
 
+                    if (locResponse.isSuccessful) {
+                        for (location in locResponse.body()!!.results) {
+                            val photosResponse = photosApi.getPhotoCount(location.id, visible=true)
+                            if (photosResponse.isSuccessful) {
+                                if (photosResponse.body()!!.count > 0) {
+                                    val marker1 = LatLng(location.latitude, location.longitude)
+                                    var place = map.addMarker(
+                                        MarkerOptions()
+                                            .position(marker1)
+                                            .title(location.name)
+                                    )
+                                    place?.tag = location.id // use the location id here to reference the location when clicked
+
+                                }
                             }
                         }
+                        page += 1
+                    } else {
+                        break
                     }
                 }
             }catch (e: Exception) {
